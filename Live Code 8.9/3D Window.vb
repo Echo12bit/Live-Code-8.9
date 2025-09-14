@@ -23,6 +23,10 @@ Public Class Form1
     Const A As Double = PI / 4
     'Must be an odd number 
 
+    Dim GridPen As New Pen(Color.IndianRed, 0.5)
+    Dim MiddleBlue As Color = Color.FromArgb(86, 108, 242)
+    Dim BetweenMiddleAndLightBlue As Color = Color.FromArgb(130, 162, 236)
+
 
     Dim MouseZoom As Double = 0
 
@@ -40,9 +44,6 @@ Public Class Form1
     Dim LB As Integer = 3
     Dim UB As Integer = 4
 
-    Dim GridPen As New Pen(Color.IndianRed, 0.5)
-    Dim MiddleBlue As Color = Color.FromArgb(86, 108, 242)
-    Dim BetweenMiddleAndLightBlue As Color = Color.FromArgb(130, 162, 236)
 
     Structure Point3D
         Public X As Double
@@ -113,40 +114,38 @@ Public Class Form1
 
         For j = 0 To MapDepth
             For i = 0 To MapWidth - 1
-                ColorGradient(i, j)
+                GridPen.Color = ColorGradient(i, j)
                 e.Graphics.DrawLine(GridPen, NewPointArray(i, j), NewPointArray(i + 1, j))
             Next
         Next
 
         For i = 0 To MapWidth
             For j = 0 To MapDepth - 1
-                ColorGradient(i, j)
+                GridPen.Color = ColorGradient(i, j)
                 e.Graphics.DrawLine(GridPen, NewPointArray(i, j), NewPointArray(i, j + 1))
             Next
         Next
 
         For j = 0 To MapDepth - 1
             For i = 0 To MapWidth - 1
-                ColorGradient(i, j)
+                GridPen.Color = ColorGradient(i, j)
                 e.Graphics.DrawLine(GridPen, NewPointArray(i + 1, j), NewPointArray(i, j + 1))
             Next
         Next
 
     End Sub
 
-    Sub ColorGradient(ByVal i As Integer, ByVal j As Integer)
-
-
+    Public Function ColorGradient(ByVal i As Integer, ByVal j As Integer) As Color
         If OGPointArray(i, j).Y < 120 Then
-            GridPen.Color = Color.LightBlue
+            Return Color.LightBlue
         ElseIf OGPointArray(i, j).Y >= 120 And OGPointArray(i, j).Y < 140 Then
-            GridPen.Color = BetweenMiddleAndLightBlue
+            Return BetweenMiddleAndLightBlue
         ElseIf OGPointArray(i, j).Y >= 140 And OGPointArray(i, j).Y < 160 Then
-            GridPen.Color = MiddleBlue
+            Return MiddleBlue
         Else
-            GridPen.Color = Color.Blue
+            Return Color.Blue
         End If
-    End Sub
+    End Function
 
     Sub PerspectiveProjection()
 

@@ -80,24 +80,29 @@ Public Class Form2
         Me.Invalidate()
     End Sub
     Private Sub Form2_Paint(sender As Object, e As PaintEventArgs) Handles MyBase.Paint
+        e.Graphics.Clear(Color.Black)
         Dim Pen2D As New Pen(Color.Brown, 0.5)
-        Dim PathPen As New Pen(Color.Black, 2)
+        Dim PathPen As New Pen(Color.Yellow, 2)
+
 
 
         For j = 0 To MapDepth
             For i = 0 To MapWidth - 1
+                Pen2D.Color = Form1.ColorGradient(i, j)
                 e.Graphics.DrawLine(Pen2D, PointArray2D(i, j), PointArray2D(i + 1, j))
             Next
         Next
 
         For i = 0 To MapWidth
             For j = 0 To MapDepth - 1
+                Pen2D.Color = Form1.ColorGradient(i, j)
                 e.Graphics.DrawLine(Pen2D, PointArray2D(i, j), PointArray2D(i, j + 1))
             Next
         Next
 
         For j = 0 To MapDepth - 1
             For i = 0 To MapWidth - 1
+                Pen2D.Color = Form1.ColorGradient(i, j)
                 e.Graphics.DrawLine(Pen2D, PointArray2D(i + 1, j), PointArray2D(i, j + 1))
             Next
         Next
@@ -212,6 +217,7 @@ Public Class Form2
         Dim CircleX As Integer
         Dim CircleY As Integer
         If StartNodeSwitch = False Then
+            ClearPath()
             StartNodeInPos = False
             Timer1.Start()
             StartNodeSwitch = True
@@ -243,6 +249,7 @@ Public Class Form2
         Dim CircleX As Integer
         Dim CircleY As Integer
         If EndNodeSwitch = False Then
+            ClearPath()
             EndNodeInPos = False
             Timer2.Start()
             EndNodeSwitch = True
