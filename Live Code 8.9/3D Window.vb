@@ -114,8 +114,10 @@ Public Class Form1
         For j = 0 To MapDepth
             For i = 0 To MapWidth - 1
                 GridPen.Color = ColorGradient(i, j)
-                If PathArrayI(i, j) = i And PathArrayJ(i, j) = j And PathArrayI(i + 1, j) = i + 1 And PathArrayJ(i + 1, j) = j Then
+                GridPen.Width = 0.5
+                If PathMark(i, j) = True And PathMark(i + 1, j) = True Then
                     GridPen.Color = Color.Yellow
+                    GridPen.Width = 2
                 End If
                 e.Graphics.DrawLine(GridPen, NewPointArray(i, j), NewPointArray(i + 1, j))
             Next
@@ -124,8 +126,10 @@ Public Class Form1
         For i = 0 To MapWidth
             For j = 0 To MapDepth - 1
                 GridPen.Color = ColorGradient(i, j)
-                If PathArrayI(i, j) = i And PathArrayJ(i, j) = j And PathArrayI(i, j + 1) = i And PathArrayJ(i, j + 1) = j Then
+                GridPen.Width = 0.5
+                If PathMark(i, j) = True And PathMark(i, j + 1) = True Then
                     GridPen.Color = Color.Yellow
+                    GridPen.Width = 2
                 End If
                 e.Graphics.DrawLine(GridPen, NewPointArray(i, j), NewPointArray(i, j + 1))
             Next
@@ -134,8 +138,10 @@ Public Class Form1
         For j = 0 To MapDepth - 1
             For i = 0 To MapWidth - 1
                 GridPen.Color = ColorGradient(i, j)
-                If PathArrayI(i + 1, j) = i And PathArrayJ(i + 1, j) = j And PathArrayI(i, j + 1) = i And PathArrayJ(i, j + 1) = j Then
+                GridPen.Width = 0.5
+                If PathMark(i + 1, j) = True And PathMark(i, j + 1) = True Then
                     GridPen.Color = Color.Yellow
+                    GridPen.Width = 2
                 End If
                 e.Graphics.DrawLine(GridPen, NewPointArray(i + 1, j), NewPointArray(i, j + 1))
             Next

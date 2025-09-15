@@ -1,5 +1,4 @@
-﻿
-Imports System.Math
+﻿Imports System.Math
 Imports System.ComponentModel.Design.Serialization
 Imports System.Security.Cryptography
 Imports System.Threading
@@ -8,8 +7,7 @@ Imports System.Drawing.Drawing2D
 Module Globals2D
     Public PathPointArray(10000) As Point
     Public PathLength As Integer
-    Public PathArrayI(100, 100) As Integer
-    Public PathArrayJ(100, 100) As Integer
+    Public PathMark(100, 100) As Boolean
 End Module
 
 Public Class Form2
@@ -93,6 +91,8 @@ Public Class Form2
 
     Sub ClearPath()
         Array.Clear(TranslatedPathPointArray, 0, TranslatedPathPointArray.Length)
+        Array.Clear(PathPointArray, 0, PathPointArray.Length)
+        Array.Clear(PathMark, 0, PathMark.Length)
         PathLength = 0
         Me.Invalidate()
     End Sub
@@ -100,10 +100,6 @@ Public Class Form2
         e.Graphics.Clear(Color.Black)
         Dim Pen2D As New Pen(Color.Brown, 0.5)
         Dim PathPen As New Pen(Color.Yellow, 2)
-
-
-
-
 
         For j = 0 To MapDepth
             For i = 0 To MapWidth - 1
@@ -217,19 +213,31 @@ Public Class Form2
         Next
 
 
-        For i = 0 To MapWidth
-            For j = 0 To MapDepth
-                For k = 0 To PathLength
-                    If OGPointArray(i, j).X = PathPointArray(k).X And OGPointArray(i, j).Z = PathPointArray(k).Y Then
-                        PathArrayI(i, j) = i
-                        PathArrayJ(i, j) = j
+        For j = 0 To MapDepth
+            For i = 0 To MapWidth
+                For k = 0 To PathLength - 1
+                    If PathPointArray(k).X >= OGPointArray(i, j).X - 2 And PathPointArray(k).X <= OGPointArray(i, j).X + 2 And PathPointArray(k).Y >= OGPointArray(i, j).Z - 2 And PathPointArray(k).Y <= OGPointArray(i, j).Z + 2 Then
+                        PathMark(i, j) = True
                     End If
                 Next
             Next
         Next
 
+        Label2.Text = " "
+        For j = 0 To MapDepth           'not working
+            For i = 0 To MapWidth
+                If PathMark(i, j) = True Then
+                    Label2.Text += i.ToString + j.ToString & vbCrLf
+                End If
+            Next
+        Next
 
-            Me.Invalidate()
+        Label3.Text = " "
+        For i = 0 To PathLength                                           'working
+            Label3.Text += PathPointArray(i).ToString & vbCrLf
+        Next
+
+        Me.Invalidate()
     End Sub
 
     Private Sub Btn_Export_Click(sender As Object, e As EventArgs) Handles Btn_Export.Click

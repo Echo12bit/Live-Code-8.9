@@ -41,6 +41,8 @@ Partial Class Form2
         EndNode = New Button()
         Timer2 = New Timer(components)
         Btn_Generate = New Button()
+        Label2 = New Label()
+        Label3 = New Label()
         CType(PictureBox1, ComponentModel.ISupportInitialize).BeginInit()
         CType(PictureBox2, ComponentModel.ISupportInitialize).BeginInit()
         CType(PictureBox3, ComponentModel.ISupportInitialize).BeginInit()
@@ -76,7 +78,7 @@ Partial Class Form2
         ' 
         ' Btn_Export
         ' 
-        Btn_Export.Location = New Point(72, 451)
+        Btn_Export.Location = New Point(32, 455)
         Btn_Export.Name = "Btn_Export"
         Btn_Export.Size = New Size(122, 57)
         Btn_Export.TabIndex = 3
@@ -90,7 +92,7 @@ Partial Class Form2
         ' PictureBox2
         ' 
         PictureBox2.BackColor = Color.FromArgb(CByte(0), CByte(70), CByte(120))
-        PictureBox2.Location = New Point(312, 576)
+        PictureBox2.Location = New Point(326, 572)
         PictureBox2.Name = "PictureBox2"
         PictureBox2.Size = New Size(960, 98)
         PictureBox2.TabIndex = 5
@@ -170,7 +172,7 @@ Partial Class Form2
         ' 
         ' Btn_Exit
         ' 
-        Btn_Exit.Location = New Point(72, 541)
+        Btn_Exit.Location = New Point(32, 616)
         Btn_Exit.Name = "Btn_Exit"
         Btn_Exit.Size = New Size(122, 54)
         Btn_Exit.TabIndex = 19
@@ -203,18 +205,38 @@ Partial Class Form2
         ' 
         ' Btn_Generate
         ' 
-        Btn_Generate.Location = New Point(72, 350)
+        Btn_Generate.Location = New Point(32, 536)
         Btn_Generate.Name = "Btn_Generate"
         Btn_Generate.Size = New Size(122, 56)
         Btn_Generate.TabIndex = 22
         Btn_Generate.Text = "Generate"
         Btn_Generate.UseVisualStyleBackColor = True
         ' 
+        ' Label2
+        ' 
+        Label2.AutoSize = True
+        Label2.Location = New Point(72, 87)
+        Label2.Name = "Label2"
+        Label2.Size = New Size(53, 20)
+        Label2.TabIndex = 23
+        Label2.Text = "Label2"
+        ' 
+        ' Label3
+        ' 
+        Label3.AutoSize = True
+        Label3.Location = New Point(190, 87)
+        Label3.Name = "Label3"
+        Label3.Size = New Size(53, 20)
+        Label3.TabIndex = 24
+        Label3.Text = "Label3"
+        ' 
         ' Form2
         ' 
         AutoScaleDimensions = New SizeF(8F, 20F)
         AutoScaleMode = AutoScaleMode.Font
         ClientSize = New Size(1320, 703)
+        Controls.Add(Label3)
+        Controls.Add(Label2)
         Controls.Add(Btn_Generate)
         Controls.Add(EndNode)
         Controls.Add(StartNode)
@@ -227,10 +249,10 @@ Partial Class Form2
         Controls.Add(PictureBox8)
         Controls.Add(PictureBox7)
         Controls.Add(PictureBox6)
-        Controls.Add(PictureBox2)
         Controls.Add(Btn_Export)
         Controls.Add(Label1)
         Controls.Add(PictureBox1)
+        Controls.Add(PictureBox2)
         Name = "Form2"
         Text = "2D Window"
         WindowState = FormWindowState.Maximized
@@ -266,4 +288,6 @@ Partial Class Form2
     Friend WithEvents EndNode As Button
     Friend WithEvents Timer2 As Timer
     Friend WithEvents Btn_Generate As Button
+    Friend WithEvents Label2 As Label
+    Friend WithEvents Label3 As Label
 End Class
