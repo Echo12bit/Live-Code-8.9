@@ -14,6 +14,9 @@ Module Globals3D
     Public Const MapWidth As Integer = 49     'Must be an odd number 
     Public Const MapDepth As Integer = 29     'Must be an odd number
     Public Const PointIncr As Integer = 5
+    Public Const StartX As Integer = ((MapWidth / 2) * PointIncr * -1)
+    Public Const StartZ As Integer = (MapDepth / 2) * PointIncr
+
 End Module
 Public Class Form1
     Dim rnd As New Random()
@@ -27,11 +30,7 @@ Public Class Form1
     Dim MiddleBlue As Color = Color.FromArgb(86, 108, 242)
     Dim BetweenMiddleAndLightBlue As Color = Color.FromArgb(130, 162, 236)
 
-
     Dim MouseZoom As Double = 0
-
-    Const StartX As Integer = ((MapWidth / 2) * PointIncr * -1)
-    Const StartZ As Integer = (MapDepth / 2) * PointIncr
 
     Dim LeftClickDetect As Boolean = False
     Dim RightClickDetect As Boolean = False
@@ -115,6 +114,9 @@ Public Class Form1
         For j = 0 To MapDepth
             For i = 0 To MapWidth - 1
                 GridPen.Color = ColorGradient(i, j)
+                If PathArrayI(i, j) = i And PathArrayJ(i, j) = j And PathArrayI(i + 1, j) = i + 1 And PathArrayJ(i + 1, j) = j Then
+                    GridPen.Color = Color.Yellow
+                End If
                 e.Graphics.DrawLine(GridPen, NewPointArray(i, j), NewPointArray(i + 1, j))
             Next
         Next
@@ -122,6 +124,9 @@ Public Class Form1
         For i = 0 To MapWidth
             For j = 0 To MapDepth - 1
                 GridPen.Color = ColorGradient(i, j)
+                If PathArrayI(i, j) = i And PathArrayJ(i, j) = j And PathArrayI(i, j + 1) = i And PathArrayJ(i, j + 1) = j Then
+                    GridPen.Color = Color.Yellow
+                End If
                 e.Graphics.DrawLine(GridPen, NewPointArray(i, j), NewPointArray(i, j + 1))
             Next
         Next
@@ -129,9 +134,14 @@ Public Class Form1
         For j = 0 To MapDepth - 1
             For i = 0 To MapWidth - 1
                 GridPen.Color = ColorGradient(i, j)
+                If PathArrayI(i + 1, j) = i And PathArrayJ(i + 1, j) = j And PathArrayI(i, j + 1) = i And PathArrayJ(i, j + 1) = j Then
+                    GridPen.Color = Color.Yellow
+                End If
                 e.Graphics.DrawLine(GridPen, NewPointArray(i + 1, j), NewPointArray(i, j + 1))
             Next
         Next
+
+
 
     End Sub
 

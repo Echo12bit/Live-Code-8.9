@@ -5,9 +5,18 @@ Imports System.Security.Cryptography
 Imports System.Threading
 Imports System.Drawing.Drawing2D
 
+Module Globals2D
+    Public PathPointArray(10000) As Point
+    Public PathLength As Integer
+    Public PathArrayI(100, 100) As Integer
+    Public PathArrayJ(100, 100) As Integer
+End Module
+
 Public Class Form2
     Dim PointArray2D(100, 100) As Point
-    Dim PathPointArray(10000) As Point
+    Dim TranslatedPointArray2D(100, 100) As Point
+    Dim TranslatedPathPointArray(10000) As Point
+
 
     Dim MouseX As Integer
     Dim MouseY As Integer
@@ -18,7 +27,6 @@ Public Class Form2
     Dim EndNodeSwitch As Boolean = False
     Dim EndNodeInPos As Boolean
 
-    Dim PathLength As Integer
 
 
     Private Sub Form2_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -69,13 +77,22 @@ Public Class Form2
 
         For j = 0 To MapDepth
             For i = 0 To MapWidth
-                PointArray2D(i, j) = New Point((i * 20) + 600, (j * 20) + 100)
+                PointArray2D(i, j) = New Point((StartX) + (i * PointIncr), (StartZ * -1) + (j * PointIncr))             'PointArray2D(i, j) = New Point((i * 20) + 600, (j * 20) + 100)
+            Next
+        Next
+
+        For j = 0 To MapDepth
+            For i = 0 To MapWidth
+                TranslatedPointArray2D(i, j) = PointArray2D(i, j)
+                TranslatedPointArray2D(i, j).X *= 4
+                TranslatedPointArray2D(i, j).Y *= 4
+                TranslatedPointArray2D(i, j) += New Point(1100, 400)
             Next
         Next
     End Sub
 
     Sub ClearPath()
-        Array.Clear(PathPointArray, 0, PathPointArray.Length)
+        Array.Clear(TranslatedPathPointArray, 0, TranslatedPathPointArray.Length)
         PathLength = 0
         Me.Invalidate()
     End Sub
@@ -86,29 +103,31 @@ Public Class Form2
 
 
 
+
+
         For j = 0 To MapDepth
             For i = 0 To MapWidth - 1
                 Pen2D.Color = Form1.ColorGradient(i, j)
-                e.Graphics.DrawLine(Pen2D, PointArray2D(i, j), PointArray2D(i + 1, j))
+                e.Graphics.DrawLine(Pen2D, TranslatedPointArray2D(i, j), TranslatedPointArray2D(i + 1, j))
             Next
         Next
 
         For i = 0 To MapWidth
             For j = 0 To MapDepth - 1
                 Pen2D.Color = Form1.ColorGradient(i, j)
-                e.Graphics.DrawLine(Pen2D, PointArray2D(i, j), PointArray2D(i, j + 1))
+                e.Graphics.DrawLine(Pen2D, TranslatedPointArray2D(i, j), TranslatedPointArray2D(i, j + 1))
             Next
         Next
 
         For j = 0 To MapDepth - 1
             For i = 0 To MapWidth - 1
                 Pen2D.Color = Form1.ColorGradient(i, j)
-                e.Graphics.DrawLine(Pen2D, PointArray2D(i + 1, j), PointArray2D(i, j + 1))
+                e.Graphics.DrawLine(Pen2D, TranslatedPointArray2D(i + 1, j), TranslatedPointArray2D(i, j + 1))
             Next
         Next
 
         For i = 0 To PathLength - 2
-            e.Graphics.DrawLine(PathPen, PathPointArray(i), PathPointArray(i + 1))
+            e.Graphics.DrawLine(PathPen, TranslatedPathPointArray(i), TranslatedPathPointArray(i + 1))
         Next
     End Sub
 
@@ -125,21 +144,21 @@ Public Class Form2
             If Abs(XDifference) <= Abs(YDifference) Then
 
                 For i = 0 To Abs(XDifference) / 20
-                    PathPointArray(i) = New Point(StartPointX + (i * 20), StartPointY - (i * 20))
+                    TranslatedPathPointArray(i) = New Point(StartPointX + (i * 20), StartPointY - (i * 20))
                     PathLength += 1
                 Next
                 For i = 1 To (Abs(YDifference) - Abs(XDifference)) / 20
-                    PathPointArray(Abs(XDifference) / 20 + i) = New Point(EndPointX, (StartPointY - Abs(XDifference)) - (i * 20))
+                    TranslatedPathPointArray(Abs(XDifference) / 20 + i) = New Point(EndPointX, (StartPointY - Abs(XDifference)) - (i * 20))
                     PathLength += 1
                 Next
             Else
 
                 For i = 0 To Abs(YDifference) / 20
-                    PathPointArray(i) = New Point(StartPointX + (i * 20), StartPointY - (i * 20))
+                    TranslatedPathPointArray(i) = New Point(StartPointX + (i * 20), StartPointY - (i * 20))
                     PathLength += 1
                 Next
                 For i = 1 To (Abs(XDifference) - Abs(YDifference)) / 20
-                    PathPointArray(Abs(YDifference) / 20 + i) = New Point((StartPointX + Abs(YDifference)) + (i * 20), EndPointY)
+                    TranslatedPathPointArray(Abs(YDifference) / 20 + i) = New Point((StartPointX + Abs(YDifference)) + (i * 20), EndPointY)
                     PathLength += 1
                 Next
             End If
@@ -149,47 +168,68 @@ Public Class Form2
             If Abs(XDifference) <= Abs(YDifference) Then
 
                 For i = 0 To Abs(XDifference) / 20
-                    PathPointArray(i) = New Point(StartPointX - (i * 20), StartPointY + (i * 20))
+                    TranslatedPathPointArray(i) = New Point(StartPointX - (i * 20), StartPointY + (i * 20))
                     PathLength += 1
                 Next
                 For i = 1 To (Abs(YDifference) - Abs(XDifference)) / 20
-                    PathPointArray(Abs(XDifference) / 20 + i) = New Point(EndPointX, (StartPointY + Abs(XDifference)) + (i * 20))
+                    TranslatedPathPointArray(Abs(XDifference) / 20 + i) = New Point(EndPointX, (StartPointY + Abs(XDifference)) + (i * 20))
                     PathLength += 1
                 Next
             Else
 
                 For i = 0 To Abs(YDifference) / 20
-                    PathPointArray(i) = New Point(StartPointX - (i * 20), StartPointY + (i * 20))
+                    TranslatedPathPointArray(i) = New Point(StartPointX - (i * 20), StartPointY + (i * 20))
                     PathLength += 1
                 Next
                 For i = 1 To (Abs(XDifference) - Abs(YDifference)) / 20
-                    PathPointArray(Abs(YDifference) / 20 + i) = New Point((StartPointX - Abs(YDifference)) - (i * 20), EndPointY)
+                    TranslatedPathPointArray(Abs(YDifference) / 20 + i) = New Point((StartPointX - Abs(YDifference)) - (i * 20), EndPointY)
                     PathLength += 1
                 Next
 
             End If
         ElseIf XDifference > 0 And YDifference > 0 Then
             For i = 0 To Abs(XDifference) / 20
-                PathPointArray(i) = New Point(StartPointX + (i * 20), StartPointY)
+                TranslatedPathPointArray(i) = New Point(StartPointX + (i * 20), StartPointY)
                 PathLength += 1
             Next
             For i = 1 To Abs(YDifference) / 20
-                PathPointArray(Abs(XDifference) / 20 + i) = New Point(EndPointX, StartPointY + (i * 20))
+                TranslatedPathPointArray(Abs(XDifference) / 20 + i) = New Point(EndPointX, StartPointY + (i * 20))
                 PathLength += 1
             Next
         ElseIf XDifference < 0 And YDifference < 0 Then
             For i = 0 To Abs(XDifference) / 20
-                PathPointArray(i) = New Point(StartPointX - (i * 20), StartPointY)
+                TranslatedPathPointArray(i) = New Point(StartPointX - (i * 20), StartPointY)
                 PathLength += 1
             Next
             For i = 1 To Abs(YDifference) / 20
-                PathPointArray(Abs(XDifference) / 20 + i) = New Point(EndPointX, StartPointY - (i * 20))
+                TranslatedPathPointArray(Abs(XDifference) / 20 + i) = New Point(EndPointX, StartPointY - (i * 20))
                 PathLength += 1
             Next
         End If
 
 
-        Me.Invalidate()
+        For i = 0 To PathLength
+            PathPointArray(i) = TranslatedPathPointArray(i)
+            PathPointArray(i) -= New Point(1100, 400)
+            PathPointArray(i).Y \= 4
+            PathPointArray(i).X \= 4
+            PathPointArray(i).Y = -PathPointArray(i).Y
+        Next
+
+
+        For i = 0 To MapWidth
+            For j = 0 To MapDepth
+                For k = 0 To PathLength
+                    If OGPointArray(i, j).X = PathPointArray(k).X And OGPointArray(i, j).Z = PathPointArray(k).Y Then
+                        PathArrayI(i, j) = i
+                        PathArrayJ(i, j) = j
+                    End If
+                Next
+            Next
+        Next
+
+
+            Me.Invalidate()
     End Sub
 
     Private Sub Btn_Export_Click(sender As Object, e As EventArgs) Handles Btn_Export.Click
@@ -223,17 +263,17 @@ Public Class Form2
             StartNodeSwitch = True
         Else
             Timer1.Stop()
-            If StartNode.Location.X >= 600 And StartNode.Location.X <= 1580 And StartNode.Location.Y >= 100 And StartNode.Location.Y <= 680 Then
+            If StartNode.Location.X >= 612 And StartNode.Location.X <= 1590 And StartNode.Location.Y >= 110 And StartNode.Location.Y <= 690 Then
                 For j = 0 To MapDepth
                     For i = 0 To MapWidth
-                        If Abs((StartNode.Location.X + 10) - PointArray2D(i, j).X) <= 10 And Abs((StartNode.Location.Y + 10) - PointArray2D(i, j).Y) <= 10 Then
+                        If Abs((StartNode.Location.X + 10) - TranslatedPointArray2D(i, j).X) <= 10 And Abs((StartNode.Location.Y + 10) - TranslatedPointArray2D(i, j).Y) <= 10 Then
                             Tempi = i
                             Tempj = j
                         End If
                     Next
                 Next
-                CircleX = PointArray2D(Tempi, Tempj).X - 10
-                CircleY = PointArray2D(Tempi, Tempj).Y - 10
+                CircleX = TranslatedPointArray2D(Tempi, Tempj).X - 10
+                CircleY = TranslatedPointArray2D(Tempi, Tempj).Y - 10
                 StartNode.Location = New Point(CircleX, CircleY)
                 StartNodeInPos = True
             Else
@@ -255,17 +295,17 @@ Public Class Form2
             EndNodeSwitch = True
         Else
             Timer2.Stop()
-            If EndNode.Location.X >= 600 And EndNode.Location.X <= 1580 And EndNode.Location.Y >= 100 And EndNode.Location.Y <= 680 Then
+            If StartNode.Location.X >= 612 And StartNode.Location.X <= 1590 And StartNode.Location.Y >= 110 And StartNode.Location.Y <= 690 Then
                 For j = 0 To MapDepth
                     For i = 0 To MapWidth
-                        If Abs((EndNode.Location.X + 10) - PointArray2D(i, j).X) <= 10 And Abs((EndNode.Location.Y + 10) - PointArray2D(i, j).Y) <= 10 Then
+                        If Abs((EndNode.Location.X + 10) - TranslatedPointArray2D(i, j).X) <= 10 And Abs((EndNode.Location.Y + 10) - TranslatedPointArray2D(i, j).Y) <= 10 Then
                             Tempi = i
                             Tempj = j
                         End If
                     Next
                 Next
-                CircleX = PointArray2D(Tempi, Tempj).X - 10
-                CircleY = PointArray2D(Tempi, Tempj).Y - 10
+                CircleX = TranslatedPointArray2D(Tempi, Tempj).X - 10
+                CircleY = TranslatedPointArray2D(Tempi, Tempj).Y - 10
                 EndNode.Location = New Point(CircleX, CircleY)
                 EndNodeInPos = True
             Else
