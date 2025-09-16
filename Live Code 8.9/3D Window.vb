@@ -21,6 +21,8 @@ End Module
 Public Class Form1
     Dim rnd As New Random()
 
+
+
     Dim AngleY As Double = 0
     Dim AngleX As Double = 0
     Const A As Double = PI / 4
@@ -29,6 +31,7 @@ Public Class Form1
     Dim GridPen As New Pen(Color.IndianRed, 0.5)
     Dim MiddleBlue As Color = Color.FromArgb(86, 108, 242)
     Dim BetweenMiddleAndLightBlue As Color = Color.FromArgb(130, 162, 236)
+    Dim LighterIndianRed As Color = Color.FromArgb(235, 130, 130)
 
     Dim MouseZoom As Double = 0
 
@@ -43,7 +46,8 @@ Public Class Form1
     Dim LB As Integer = 3
     Dim UB As Integer = 4
 
-
+    Dim TopTriangles(100, 100)() As Point
+    Dim BottemTriangles(100, 100)() As Point
     Structure Point3D
         Public X As Double
         Public Y As Double
@@ -106,17 +110,58 @@ Public Class Form1
                 NewPointArray(i, j) = New Point(XpArray(i, j) + Me.Width / 2, YpArray(i, j))
             Next
         Next
+
+        For j = 0 To MapDepth - 1
+            For i = 0 To MapWidth - 1
+                TopTriangles(i, j) = {
+                    NewPointArray(i, j),
+                    NewPointArray(i + 1, j),
+                    NewPointArray(i, j + 1)
+                }
+
+                BottemTriangles(i, j) = {
+                    NewPointArray(i + 1, j + 1),
+                    NewPointArray(i + 1, j),
+                    NewPointArray(i, j + 1)
+                }
+            Next
+        Next
+
     End Sub
     Private Sub Form1_Paint(sender As Object, e As PaintEventArgs) Handles MyBase.Paint
         e.Graphics.Clear(Color.Black)
+        Dim CustomBrush As New SolidBrush(LighterIndianRed)
+
+        '///////////////// Draws lines \\\\\\\\\\\\\\\\\\\\
+
+        For j = 0 To MapDepth - 1
+            For i = 0 To MapWidth - 1
+                If TopTriangles(i, j) IsNot Nothing Then
+                    CustomBrush.Color = ColorGradient(i, j)
+                    e.Graphics.FillPolygon(CustomBrush, TopTriangles(i, j))
+                End If
+            Next
+        Next
+
+
+        For j = 0 To MapDepth - 1
+            For i = 0 To MapWidth - 1
+                If BottemTriangles(i, j) IsNot Nothing Then
+                    CustomBrush.Color = OffColorGradient(i, j)
+                    e.Graphics.FillPolygon(CustomBrush, BottemTriangles(i, j))
+                End If
+            Next
+        Next
+
 
         For j = 0 To MapDepth
             For i = 0 To MapWidth - 1
-                GridPen.Color = ColorGradient(i, j)
+                GridPen.Color = Color.Wheat
                 GridPen.Width = 0.5
                 If PathMark(i, j) = True And PathMark(i + 1, j) = True Then
-                    GridPen.Color = Color.Yellow
-                    GridPen.Width = 2
+                    GridPen.Color = Color.Red
+                    GridPen.Width = 4
+                    'e.Graphics.DrawLine(GridPen, NewPointArray(i, j), NewPointArray(i + 1, j))
                 End If
                 e.Graphics.DrawLine(GridPen, NewPointArray(i, j), NewPointArray(i + 1, j))
             Next
@@ -124,11 +169,12 @@ Public Class Form1
 
         For i = 0 To MapWidth
             For j = 0 To MapDepth - 1
-                GridPen.Color = ColorGradient(i, j)
+                GridPen.Color = Color.Wheat
                 GridPen.Width = 0.5
                 If PathMark(i, j) = True And PathMark(i, j + 1) = True Then
-                    GridPen.Color = Color.Yellow
-                    GridPen.Width = 2
+                    GridPen.Color = Color.Red
+                    GridPen.Width = 4
+                    'e.Graphics.DrawLine(GridPen, NewPointArray(i, j), NewPointArray(i, j + 1))
                 End If
                 e.Graphics.DrawLine(GridPen, NewPointArray(i, j), NewPointArray(i, j + 1))
             Next
@@ -136,29 +182,41 @@ Public Class Form1
 
         For j = 0 To MapDepth - 1
             For i = 0 To MapWidth - 1
-                GridPen.Color = ColorGradient(i, j)
+                GridPen.Color = Color.Wheat
                 GridPen.Width = 0.5
                 If PathMark(i + 1, j) = True And PathMark(i, j + 1) = True Then
-                    GridPen.Color = Color.Yellow
-                    GridPen.Width = 2
+                    GridPen.Color = Color.Red
+                    GridPen.Width = 4
+                    'e.Graphics.DrawLine(GridPen, NewPointArray(i + 1, j), NewPointArray(i, j + 1))
                 End If
                 e.Graphics.DrawLine(GridPen, NewPointArray(i + 1, j), NewPointArray(i, j + 1))
             Next
         Next
 
 
-
     End Sub
 
     Public Function ColorGradient(ByVal i As Integer, ByVal j As Integer) As Color
-        If OGPointArray(i, j).Y < 120 Then
+        If OGPointArray(i, j).Y < 145 Then
             Return Color.LightBlue
-        ElseIf OGPointArray(i, j).Y >= 120 And OGPointArray(i, j).Y < 140 Then
+        ElseIf OGPointArray(i, j).Y >= 145 And OGPointArray(i, j).Y < 150 Then
             Return BetweenMiddleAndLightBlue
-        ElseIf OGPointArray(i, j).Y >= 140 And OGPointArray(i, j).Y < 160 Then
+        ElseIf OGPointArray(i, j).Y >= 150 And OGPointArray(i, j).Y < 160 Then
             Return MiddleBlue
         Else
             Return Color.Blue
+        End If
+    End Function
+
+    Public Function OffColorGradient(ByVal i As Integer, ByVal j As Integer) As Color
+        If OGPointArray(i, j).Y < 145 Then
+            Return Color.FromArgb(150, 200, 220)
+        ElseIf OGPointArray(i, j).Y >= 145 And OGPointArray(i, j).Y < 150 Then
+            Return Color.FromArgb(115, 145, 220)
+        ElseIf OGPointArray(i, j).Y >= 150 And OGPointArray(i, j).Y < 160 Then
+            Return Color.FromArgb(70, 95, 230)
+        Else
+            Return Color.FromArgb(0, 0, 220)
         End If
     End Function
 
@@ -315,6 +373,7 @@ Public Class Form1
     End Sub
 
     Private Sub Btn_Hide_Click(sender As Object, e As EventArgs) Handles Btn_Hide.Click
+        Timer1.Stop()
         Reset()
         Form2.Show()
         Me.Hide()

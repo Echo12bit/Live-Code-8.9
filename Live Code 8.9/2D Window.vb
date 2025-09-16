@@ -94,7 +94,7 @@ Public Class Form2
     Private Sub Form2_Paint(sender As Object, e As PaintEventArgs) Handles MyBase.Paint
         e.Graphics.Clear(Color.Black)
         Dim Pen2D As New Pen(Color.Brown, 0.5)
-        Dim PathPen As New Pen(Color.Yellow, 2)
+        Dim PathPen As New Pen(Color.Red, 4)
 
         For j = 0 To MapDepth
             For i = 0 To MapWidth - 1
