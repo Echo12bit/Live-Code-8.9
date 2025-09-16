@@ -110,7 +110,6 @@ Public Class Form1
     Private Sub Form1_Paint(sender As Object, e As PaintEventArgs) Handles MyBase.Paint
         e.Graphics.Clear(Color.Black)
 
-
         For j = 0 To MapDepth
             For i = 0 To MapWidth - 1
                 GridPen.Color = ColorGradient(i, j)
@@ -282,14 +281,7 @@ Public Class Form1
     End Sub
 
     Private Sub Btn_Reset_Click(sender As Object, e As EventArgs) Handles Btn_Reset.Click
-        For j = 0 To MapDepth
-            For i = 0 To MapWidth
-                OGPointArray(i, j) = New Point3D((StartX) + (i * PointIncr), YValue(i, j), StartZ - (j * PointIncr))
-            Next
-        Next
-
-        PPand2DArray()
-        Me.Invalidate()
+        Reset()
     End Sub
 
     Private Sub Btn_Regenerate_Click(sender As Object, e As EventArgs) Handles Btn_Regenerate.Click
@@ -323,9 +315,19 @@ Public Class Form1
     End Sub
 
     Private Sub Btn_Hide_Click(sender As Object, e As EventArgs) Handles Btn_Hide.Click
+        Reset()
         Form2.Show()
         Me.Hide()
     End Sub
 
+    Sub Reset()
+        For j = 0 To MapDepth
+            For i = 0 To MapWidth
+                OGPointArray(i, j) = New Point3D((StartX) + (i * PointIncr), YValue(i, j), StartZ - (j * PointIncr))
+            Next
+        Next
 
+        PPand2DArray()
+        Me.Invalidate()
+    End Sub
 End Class

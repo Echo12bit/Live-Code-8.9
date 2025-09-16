@@ -1,7 +1,4 @@
 ﻿Imports System.Math
-Imports System.ComponentModel.Design.Serialization
-Imports System.Security.Cryptography
-Imports System.Threading
 Imports System.Drawing.Drawing2D
 
 Module Globals2D
@@ -15,15 +12,13 @@ Public Class Form2
     Dim TranslatedPointArray2D(100, 100) As Point
     Dim TranslatedPathPointArray(10000) As Point
 
-
     Dim MouseX As Integer
     Dim MouseY As Integer
 
-
     Dim StartNodeSwitch As Boolean = False
-    Dim StartNodeInPos As Boolean
+    Dim StartNodeInPos As Boolean = False
     Dim EndNodeSwitch As Boolean = False
-    Dim EndNodeInPos As Boolean
+    Dim EndNodeInPos As Boolean = False
 
 
 
@@ -223,19 +218,19 @@ Public Class Form2
             Next
         Next
 
-        Label2.Text = " "
-        For j = 0 To MapDepth           'not working
-            For i = 0 To MapWidth
-                If PathMark(i, j) = True Then
-                    Label2.Text += i.ToString + j.ToString & vbCrLf
-                End If
-            Next
-        Next
+        'Label2.Text = " "
+        'For j = 0 To MapDepth
+        '    For i = 0 To MapWidth
+        '        If PathMark(i, j) = True Then
+        '            Label2.Text += i.ToString + j.ToString & vbCrLf
+        '        End If
+        '    Next
+        'Next
 
-        Label3.Text = " "
-        For i = 0 To PathLength                                           'working
-            Label3.Text += PathPointArray(i).ToString & vbCrLf
-        Next
+        'Label3.Text = " "
+        'For i = 0 To PathLength
+        '    Label3.Text += PathPointArray(i).ToString & vbCrLf
+        'Next
 
         Me.Invalidate()
     End Sub
