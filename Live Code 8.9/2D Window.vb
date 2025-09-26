@@ -12,7 +12,7 @@ Public Class Form2
     Dim PointArray2D(100, 100) As Point
     Dim TranslatedPointArray2D(100, 100) As Point
     Dim TranslatedPathPointArray(10000) As Point
-
+    Dim TranslatedPathPointList As New List(Of Point)
     Dim MouseX As Integer
     Dim MouseY As Integer
 
@@ -29,7 +29,7 @@ Public Class Form2
     Dim GeneralNodeLoc As Point
     Dim ClickedButton As Button
 
-
+    Dim NodesOnGridList As New List(Of Point)
 
     Private Sub Form2_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.BackColor = Color.White
@@ -97,7 +97,8 @@ Public Class Form2
     End Sub
 
     Sub ClearPath()
-        Array.Clear(TranslatedPathPointArray, 0, TranslatedPathPointArray.Length)
+        'Array.Clear(TranslatedPathPointArray, 0, TranslatedPathPointArray.Length)
+        TranslatedPathPointList.Clear()
         Array.Clear(PathPointArray, 0, PathPointArray.Length)
         Array.Clear(PathMark, 0, PathMark.Length)
         PathLength = 0
@@ -130,7 +131,7 @@ Public Class Form2
         Next
 
         For i = 0 To PathLength - 2
-            e.Graphics.DrawLine(PathPen, TranslatedPathPointArray(i), TranslatedPathPointArray(i + 1))
+            e.Graphics.DrawLine(PathPen, TranslatedPathPointList(i), TranslatedPathPointList(i + 1))
         Next
     End Sub
 
@@ -147,21 +148,21 @@ Public Class Form2
             If Abs(XDifference) <= Abs(YDifference) Then
 
                 For i = 0 To Abs(XDifference) / 20
-                    TranslatedPathPointArray(i) = New Point(StartPointX + (i * 20), StartPointY - (i * 20))
+                    TranslatedPathPointList.Add(New Point(StartPointX + (i * 20), StartPointY - (i * 20)))
                     PathLength += 1
                 Next
                 For i = 1 To (Abs(YDifference) - Abs(XDifference)) / 20
-                    TranslatedPathPointArray(Abs(XDifference) / 20 + i) = New Point(EndPointX, (StartPointY - Abs(XDifference)) - (i * 20))
+                    TranslatedPathPointList.Add(New Point(EndPointX, (StartPointY - Abs(XDifference)) - (i * 20)))
                     PathLength += 1
                 Next
             Else
 
                 For i = 0 To Abs(YDifference) / 20
-                    TranslatedPathPointArray(i) = New Point(StartPointX + (i * 20), StartPointY - (i * 20))
+                    TranslatedPathPointList.Add(New Point(StartPointX + (i * 20), StartPointY - (i * 20)))
                     PathLength += 1
                 Next
                 For i = 1 To (Abs(XDifference) - Abs(YDifference)) / 20
-                    TranslatedPathPointArray(Abs(YDifference) / 20 + i) = New Point((StartPointX + Abs(YDifference)) + (i * 20), EndPointY)
+                    TranslatedPathPointList.Add(New Point((StartPointX + Abs(YDifference)) + (i * 20), EndPointY))
                     PathLength += 1
                 Next
             End If
@@ -171,48 +172,48 @@ Public Class Form2
             If Abs(XDifference) <= Abs(YDifference) Then
 
                 For i = 0 To Abs(XDifference) / 20
-                    TranslatedPathPointArray(i) = New Point(StartPointX - (i * 20), StartPointY + (i * 20))
+                    TranslatedPathPointList.Add(New Point(StartPointX - (i * 20), StartPointY + (i * 20)))
                     PathLength += 1
                 Next
                 For i = 1 To (Abs(YDifference) - Abs(XDifference)) / 20
-                    TranslatedPathPointArray(Abs(XDifference) / 20 + i) = New Point(EndPointX, (StartPointY + Abs(XDifference)) + (i * 20))
+                    TranslatedPathPointList.Add(New Point(EndPointX, (StartPointY + Abs(XDifference)) + (i * 20)))
                     PathLength += 1
                 Next
             Else
 
                 For i = 0 To Abs(YDifference) / 20
-                    TranslatedPathPointArray(i) = New Point(StartPointX - (i * 20), StartPointY + (i * 20))
+                    TranslatedPathPointList.Add(New Point(StartPointX - (i * 20), StartPointY + (i * 20)))
                     PathLength += 1
                 Next
                 For i = 1 To (Abs(XDifference) - Abs(YDifference)) / 20
-                    TranslatedPathPointArray(Abs(YDifference) / 20 + i) = New Point((StartPointX - Abs(YDifference)) - (i * 20), EndPointY)
+                    TranslatedPathPointList.Add(New Point((StartPointX - Abs(YDifference)) - (i * 20), EndPointY))
                     PathLength += 1
                 Next
 
             End If
         ElseIf XDifference > 0 And YDifference > 0 Then
             For i = 0 To Abs(XDifference) / 20
-                TranslatedPathPointArray(i) = New Point(StartPointX + (i * 20), StartPointY)
+                TranslatedPathPointList.Add(New Point(StartPointX + (i * 20), StartPointY))
                 PathLength += 1
             Next
             For i = 1 To Abs(YDifference) / 20
-                TranslatedPathPointArray(Abs(XDifference) / 20 + i) = New Point(EndPointX, StartPointY + (i * 20))
+                TranslatedPathPointList.Add(New Point(EndPointX, StartPointY + (i * 20)))
                 PathLength += 1
             Next
         ElseIf XDifference < 0 And YDifference < 0 Then
             For i = 0 To Abs(XDifference) / 20
-                TranslatedPathPointArray(i) = New Point(StartPointX - (i * 20), StartPointY)
+                TranslatedPathPointList.Add(New Point(StartPointX - (i * 20), StartPointY))
                 PathLength += 1
             Next
             For i = 1 To Abs(YDifference) / 20
-                TranslatedPathPointArray(Abs(XDifference) / 20 + i) = New Point(EndPointX, StartPointY - (i * 20))
+                TranslatedPathPointList.Add(New Point(EndPointX, StartPointY - (i * 20)))
                 PathLength += 1
             Next
         End If
 
 
-        For i = 0 To PathLength
-            PathPointArray(i) = TranslatedPathPointArray(i)
+        For i = 0 To PathLength - 1
+            PathPointArray(i) = TranslatedPathPointList(i)
             PathPointArray(i) -= New Point(1100, 400)
             PathPointArray(i).Y \= 4
             PathPointArray(i).X \= 4
@@ -263,6 +264,8 @@ Public Class Form2
 
     Private Sub Btn_Generate_Click(sender As Object, e As EventArgs) Handles Btn_Generate.Click
         If StartNodeInPos = True And EndNodeInPos = True Then
+            NodesOnGridList.Remove(EndNode.Location)
+            NodesOnGridList.Add(EndNode.Location)
             PathFinding()
         End If
     End Sub
@@ -324,12 +327,16 @@ Public Class Form2
                 CircleX = TranslatedPointArray2D(Tempi, Tempj).X - 10
                 CircleY = TranslatedPointArray2D(Tempi, Tempj).Y - 10
                 ClickedButton.Location = New Point(CircleX, CircleY)
+
                 If ClickedButton.Name = "StartNode" Then
                     StartNodeInPos = True
+                    NodesOnGridList.Insert(0, ClickedButton.Location)
                 ElseIf ClickedButton.Name = "EndNode" Then
                     EndNodeInPos = True
+                    NodesOnGridList.Add(ClickedButton.Location)
+                Else
+                    NodesOnGridList.Add(ClickedButton.Location)
                 End If
-                GeneralNodeInPos = True
             Else
                 ClickedButton.Location = New Point(500, 900)
             End If
