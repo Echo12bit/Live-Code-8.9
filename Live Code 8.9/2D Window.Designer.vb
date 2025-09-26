@@ -39,10 +39,10 @@ Partial Class Form2
         Btn_Exit = New Button()
         StartNode = New Button()
         EndNode = New Button()
-        Timer2 = New Timer(components)
         Btn_Generate = New Button()
         Label2 = New Label()
         Label3 = New Label()
+        TextBox1 = New TextBox()
         CType(PictureBox1, ComponentModel.ISupportInitialize).BeginInit()
         CType(PictureBox2, ComponentModel.ISupportInitialize).BeginInit()
         CType(PictureBox3, ComponentModel.ISupportInitialize).BeginInit()
@@ -199,10 +199,6 @@ Partial Class Form2
         EndNode.TabIndex = 21
         EndNode.UseVisualStyleBackColor = False
         ' 
-        ' Timer2
-        ' 
-        Timer2.Interval = 1
-        ' 
         ' Btn_Generate
         ' 
         Btn_Generate.Location = New Point(32, 536)
@@ -230,11 +226,19 @@ Partial Class Form2
         Label3.TabIndex = 24
         Label3.Text = "Label3"
         ' 
+        ' TextBox1
+        ' 
+        TextBox1.Location = New Point(80, 316)
+        TextBox1.Name = "TextBox1"
+        TextBox1.Size = New Size(125, 27)
+        TextBox1.TabIndex = 25
+        ' 
         ' Form2
         ' 
         AutoScaleDimensions = New SizeF(8F, 20F)
         AutoScaleMode = AutoScaleMode.Font
         ClientSize = New Size(1320, 703)
+        Controls.Add(TextBox1)
         Controls.Add(Label3)
         Controls.Add(Label2)
         Controls.Add(Btn_Generate)
@@ -286,8 +290,8 @@ Partial Class Form2
     Friend WithEvents Btn_Exit As Button
     Friend WithEvents StartNode As Button
     Friend WithEvents EndNode As Button
-    Friend WithEvents Timer2 As Timer
     Friend WithEvents Btn_Generate As Button
     Friend WithEvents Label2 As Label
     Friend WithEvents Label3 As Label
+    Friend WithEvents TextBox1 As TextBox
 End Class

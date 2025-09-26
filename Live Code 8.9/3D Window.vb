@@ -156,8 +156,8 @@ Public Class Form1
 
         For j = 0 To MapDepth
             For i = 0 To MapWidth - 1
-                GridPen.Color = Color.Wheat
-                GridPen.Width = 0.5
+                GridPen.Color = Color.Black
+                GridPen.Width = 0.25
                 If PathMark(i, j) = True And PathMark(i + 1, j) = True Then
                     GridPen.Color = Color.Red
                     GridPen.Width = 4
@@ -169,8 +169,8 @@ Public Class Form1
 
         For i = 0 To MapWidth
             For j = 0 To MapDepth - 1
-                GridPen.Color = Color.Wheat
-                GridPen.Width = 0.5
+                GridPen.Color = Color.Black
+                GridPen.Width = 0.25
                 If PathMark(i, j) = True And PathMark(i, j + 1) = True Then
                     GridPen.Color = Color.Red
                     GridPen.Width = 4
@@ -182,8 +182,8 @@ Public Class Form1
 
         For j = 0 To MapDepth - 1
             For i = 0 To MapWidth - 1
-                GridPen.Color = Color.Wheat
-                GridPen.Width = 0.5
+                GridPen.Color = Color.Black
+                GridPen.Width = 0.25
                 If PathMark(i + 1, j) = True And PathMark(i, j + 1) = True Then
                     GridPen.Color = Color.Red
                     GridPen.Width = 4

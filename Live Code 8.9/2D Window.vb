@@ -1,5 +1,6 @@
 ﻿Imports System.Math
 Imports System.Drawing.Drawing2D
+Imports System.IO
 
 Module Globals2D
     Public PathPointArray(10000) As Point
@@ -19,6 +20,14 @@ Public Class Form2
     Dim StartNodeInPos As Boolean = False
     Dim EndNodeSwitch As Boolean = False
     Dim EndNodeInPos As Boolean = False
+    Dim GeneralNodeSwitch As Boolean = False
+    Dim GeneralNodeInPos As Boolean = False
+
+    Dim NumOfNodes As Integer
+    Dim NodeArray(100) As Button
+
+    Dim GeneralNodeLoc As Point
+    Dim ClickedButton As Button
 
 
 
@@ -82,6 +91,9 @@ Public Class Form2
                 TranslatedPointArray2D(i, j) += New Point(1100, 400)
             Next
         Next
+
+        AddHandler StartNode.Click, AddressOf Node_Click
+        AddHandler EndNode.Click, AddressOf Node_Click
     End Sub
 
     Sub ClearPath()
@@ -245,86 +257,87 @@ Public Class Form2
         MouseY = e.Y
     End Sub
 
-    Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick
-        StartNode.Location = New Point(Cursor.Position.X - 10, Cursor.Position.Y - 10)
-
-    End Sub
-
     Private Sub Btn_Exit_Click(sender As Object, e As EventArgs) Handles Btn_Exit.Click
         Application.Exit()
-    End Sub
-
-    Private Sub StartNode_Click(sender As Object, e As EventArgs) Handles StartNode.Click
-        Dim Tempi As Integer
-        Dim Tempj As Integer
-        Dim CircleX As Integer
-        Dim CircleY As Integer
-        If StartNodeSwitch = False Then
-            ClearPath()
-            StartNodeInPos = False
-            Timer1.Start()
-            StartNodeSwitch = True
-        Else
-            Timer1.Stop()
-            If StartNode.Location.X >= 612 And StartNode.Location.X <= 1590 And StartNode.Location.Y >= 110 And StartNode.Location.Y <= 690 Then
-                For j = 0 To MapDepth
-                    For i = 0 To MapWidth
-                        If Abs((StartNode.Location.X + 10) - TranslatedPointArray2D(i, j).X) <= 10 And Abs((StartNode.Location.Y + 10) - TranslatedPointArray2D(i, j).Y) <= 10 Then
-                            Tempi = i
-                            Tempj = j
-                        End If
-                    Next
-                Next
-                CircleX = TranslatedPointArray2D(Tempi, Tempj).X - 10
-                CircleY = TranslatedPointArray2D(Tempi, Tempj).Y - 10
-                StartNode.Location = New Point(CircleX, CircleY)
-                StartNodeInPos = True
-            Else
-                StartNode.Location = New Point(500, 900)
-            End If
-            StartNodeSwitch = False
-        End If
-    End Sub
-
-    Private Sub EndNode_Click(sender As Object, e As EventArgs) Handles EndNode.Click
-        Dim Tempi As Integer
-        Dim Tempj As Integer
-        Dim CircleX As Integer
-        Dim CircleY As Integer
-        If EndNodeSwitch = False Then
-            ClearPath()
-            EndNodeInPos = False
-            Timer2.Start()
-            EndNodeSwitch = True
-        Else
-            Timer2.Stop()
-            If StartNode.Location.X >= 612 And StartNode.Location.X <= 1590 And StartNode.Location.Y >= 110 And StartNode.Location.Y <= 690 Then
-                For j = 0 To MapDepth
-                    For i = 0 To MapWidth
-                        If Abs((EndNode.Location.X + 10) - TranslatedPointArray2D(i, j).X) <= 10 And Abs((EndNode.Location.Y + 10) - TranslatedPointArray2D(i, j).Y) <= 10 Then
-                            Tempi = i
-                            Tempj = j
-                        End If
-                    Next
-                Next
-                CircleX = TranslatedPointArray2D(Tempi, Tempj).X - 10
-                CircleY = TranslatedPointArray2D(Tempi, Tempj).Y - 10
-                EndNode.Location = New Point(CircleX, CircleY)
-                EndNodeInPos = True
-            Else
-                EndNode.Location = New Point(500, 950)
-            End If
-            EndNodeSwitch = False
-        End If
-    End Sub
-
-    Private Sub Timer2_Tick(sender As Object, e As EventArgs) Handles Timer2.Tick
-        EndNode.Location = New Point(Cursor.Position.X - 10, Cursor.Position.Y - 10)
     End Sub
 
     Private Sub Btn_Generate_Click(sender As Object, e As EventArgs) Handles Btn_Generate.Click
         If StartNodeInPos = True And EndNodeInPos = True Then
             PathFinding()
         End If
+    End Sub
+
+    Private Sub TextBox1_TextChanged(sender As Object, e As EventArgs) Handles TextBox1.TextChanged
+        Dim Path3 As New GraphicsPath()
+        Path3.AddEllipse(0, 0, 20, 20)
+
+
+        For i = 0 To 100
+            Me.Controls.Remove(NodeArray(i))
+            NodeArray(i) = Nothing
+        Next
+        Array.Clear(NodeArray, 0, NodeArray.Length)
+
+        If Integer.TryParse(TextBox1.Text, NumOfNodes) AndAlso NumOfNodes > 0 Then
+            For i = 0 To NumOfNodes - 1
+                NodeArray(i) = New Button() With {
+                .Name = "Intermediate" & i.ToString,
+                .Location = New Point(400, 700 + i * 50),
+                .Region = New Region(Path3),
+                .ForeColor = Color.Red,
+                .BackColor = Color.Red
+                }
+                Me.Controls.Add(NodeArray(i))
+                NodeArray(i).BringToFront()
+                AddHandler NodeArray(i).Click, AddressOf Node_Click
+            Next
+        End If
+    End Sub
+
+    Private Sub Node_Click(sender As Object, e As EventArgs)
+        ClickedButton = DirectCast(sender, Button)
+        Dim Tempi As Integer
+        Dim Tempj As Integer
+        Dim CircleX As Integer
+        Dim CircleY As Integer
+
+        If GeneralNodeSwitch = False Then
+            ClearPath()
+            If ClickedButton.Name = "StartNode" Then
+                StartNodeInPos = False
+            ElseIf ClickedButton.Name = "EndNode" Then
+                EndNodeInPos = False
+            End If
+            Timer1.Start()
+            GeneralNodeSwitch = True
+        Else
+            Timer1.Stop()
+            If ClickedButton.Location.X >= 612 And ClickedButton.Location.X <= 1590 And ClickedButton.Location.Y >= 110 And ClickedButton.Location.Y <= 690 Then
+                For j = 0 To MapDepth
+                    For i = 0 To MapWidth
+                        If Abs((ClickedButton.Location.X + 10) - TranslatedPointArray2D(i, j).X) <= 10 And Abs((ClickedButton.Location.Y + 10) - TranslatedPointArray2D(i, j).Y) <= 10 Then
+                            Tempi = i
+                            Tempj = j
+                        End If
+                    Next
+                Next
+                CircleX = TranslatedPointArray2D(Tempi, Tempj).X - 10
+                CircleY = TranslatedPointArray2D(Tempi, Tempj).Y - 10
+                ClickedButton.Location = New Point(CircleX, CircleY)
+                If ClickedButton.Name = "StartNode" Then
+                    StartNodeInPos = True
+                ElseIf ClickedButton.Name = "EndNode" Then
+                    EndNodeInPos = True
+                End If
+                GeneralNodeInPos = True
+            Else
+                ClickedButton.Location = New Point(500, 900)
+            End If
+            GeneralNodeSwitch = False
+        End If
+    End Sub
+
+    Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick
+        ClickedButton.Location = New Point(Cursor.Position.X - 10, Cursor.Position.Y - 10)
     End Sub
 End Class
