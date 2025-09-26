@@ -40,8 +40,6 @@ Partial Class Form2
         StartNode = New Button()
         EndNode = New Button()
         Btn_Generate = New Button()
-        Label2 = New Label()
-        Label3 = New Label()
         TextBox1 = New TextBox()
         CType(PictureBox1, ComponentModel.ISupportInitialize).BeginInit()
         CType(PictureBox2, ComponentModel.ISupportInitialize).BeginInit()
@@ -208,24 +206,6 @@ Partial Class Form2
         Btn_Generate.Text = "Generate"
         Btn_Generate.UseVisualStyleBackColor = True
         ' 
-        ' Label2
-        ' 
-        Label2.AutoSize = True
-        Label2.Location = New Point(72, 87)
-        Label2.Name = "Label2"
-        Label2.Size = New Size(53, 20)
-        Label2.TabIndex = 23
-        Label2.Text = "Label2"
-        ' 
-        ' Label3
-        ' 
-        Label3.AutoSize = True
-        Label3.Location = New Point(190, 87)
-        Label3.Name = "Label3"
-        Label3.Size = New Size(53, 20)
-        Label3.TabIndex = 24
-        Label3.Text = "Label3"
-        ' 
         ' TextBox1
         ' 
         TextBox1.Location = New Point(80, 316)
@@ -239,8 +219,6 @@ Partial Class Form2
         AutoScaleMode = AutoScaleMode.Font
         ClientSize = New Size(1320, 703)
         Controls.Add(TextBox1)
-        Controls.Add(Label3)
-        Controls.Add(Label2)
         Controls.Add(Btn_Generate)
         Controls.Add(EndNode)
         Controls.Add(StartNode)
@@ -291,7 +269,5 @@ Partial Class Form2
     Friend WithEvents StartNode As Button
     Friend WithEvents EndNode As Button
     Friend WithEvents Btn_Generate As Button
-    Friend WithEvents Label2 As Label
-    Friend WithEvents Label3 As Label
     Friend WithEvents TextBox1 As TextBox
 End Class
