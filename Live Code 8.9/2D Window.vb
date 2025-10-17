@@ -23,7 +23,6 @@ Public Class Form2
     Dim GeneralNodeInPos As Boolean = False
 
     Dim NumOfNodes As Integer
-    Dim NodeArray(100) As Button
 
     Dim ClickedButton As Button
 
@@ -102,6 +101,7 @@ Public Class Form2
         e.Graphics.Clear(Color.Black)
         Dim Pen2D As New Pen(Color.Brown, 0.5)
         Dim PathPen As New Pen(Color.Red, 4)
+        e.Graphics.SmoothingMode = SmoothingMode.AntiAlias
 
         For j = 0 To MapDepth
             For i = 0 To MapWidth - 1
@@ -247,6 +247,7 @@ Public Class Form2
     End Sub
 
     Private Sub Btn_Generate_Click(sender As Object, e As EventArgs) Handles Btn_Generate.Click
+
         If StartNodeInPos = True And EndNodeInPos = True Then
             NodesOnGridList.Remove(EndNode.Location)
             NodesOnGridList.Add(EndNode.Location)
@@ -257,22 +258,21 @@ Public Class Form2
     Private Sub TextBox1_TextChanged(sender As Object, e As EventArgs) Handles TextBox1.TextChanged
         Dim Path3 As New GraphicsPath()
         Path3.AddEllipse(0, 0, 20, 20)
+        Dim NodeArray(100) As Button
+        Dim NodeYLocation As Integer
+        Dim NodeXLocation As Integer
 
-
-        For i = 0 To 100
-            Me.Controls.Remove(NodeArray(i))
-            NodeArray(i) = Nothing
-        Next
-        Array.Clear(NodeArray, 0, NodeArray.Length)
-
-        If Integer.TryParse(TextBox1.Text, NumOfNodes) AndAlso NumOfNodes > 0 Then
+        If Integer.TryParse(TextBox1.Text, NumOfNodes) AndAlso NumOfNodes > 0 AndAlso NumOfNodes <= 35 Then
             For i = 0 To NumOfNodes - 1
+                NodeXLocation = i \ 5
+                NodeYLocation = i Mod 5
+
                 NodeArray(i) = New Button() With {
                 .Name = "Intermediate" & i.ToString,
-                .Location = New Point(400, 700 + i * 50),
-                .Region = New Region(Path3),
-                .ForeColor = Color.Red,
-                .BackColor = Color.Red
+                .Location = New Point(850 + NodeXLocation * 80, 880 + NodeYLocation * 40),
+                .FlatStyle = FlatStyle.Flat,
+                .BackColor = Color.FromArgb(255, 0, 0),
+                .Region = New Region(Path3)
                 }
                 Me.Controls.Add(NodeArray(i))
                 NodeArray(i).BringToFront()

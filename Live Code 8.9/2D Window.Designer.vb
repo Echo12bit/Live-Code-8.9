@@ -76,9 +76,9 @@ Partial Class Form2
         ' 
         ' Btn_Export
         ' 
-        Btn_Export.Location = New Point(32, 455)
+        Btn_Export.Location = New Point(12, 122)
         Btn_Export.Name = "Btn_Export"
-        Btn_Export.Size = New Size(122, 57)
+        Btn_Export.Size = New Size(206, 57)
         Btn_Export.TabIndex = 3
         Btn_Export.Text = "3D Export"
         Btn_Export.UseVisualStyleBackColor = True
@@ -170,9 +170,9 @@ Partial Class Form2
         ' 
         ' Btn_Exit
         ' 
-        Btn_Exit.Location = New Point(32, 616)
+        Btn_Exit.Location = New Point(12, 254)
         Btn_Exit.Name = "Btn_Exit"
-        Btn_Exit.Size = New Size(122, 54)
+        Btn_Exit.Size = New Size(206, 57)
         Btn_Exit.TabIndex = 19
         Btn_Exit.Text = "Exit"
         Btn_Exit.UseVisualStyleBackColor = True
@@ -181,7 +181,7 @@ Partial Class Form2
         ' 
         StartNode.BackColor = Color.Lime
         StartNode.FlatStyle = FlatStyle.Flat
-        StartNode.Location = New Point(60, 145)
+        StartNode.Location = New Point(326, 254)
         StartNode.Name = "StartNode"
         StartNode.Size = New Size(94, 29)
         StartNode.TabIndex = 20
@@ -191,7 +191,7 @@ Partial Class Form2
         ' 
         EndNode.BackColor = Color.Fuchsia
         EndNode.FlatStyle = FlatStyle.Flat
-        EndNode.Location = New Point(60, 203)
+        EndNode.Location = New Point(326, 299)
         EndNode.Name = "EndNode"
         EndNode.Size = New Size(94, 29)
         EndNode.TabIndex = 21
@@ -199,16 +199,16 @@ Partial Class Form2
         ' 
         ' Btn_Generate
         ' 
-        Btn_Generate.Location = New Point(32, 536)
+        Btn_Generate.Location = New Point(12, 185)
         Btn_Generate.Name = "Btn_Generate"
-        Btn_Generate.Size = New Size(122, 56)
+        Btn_Generate.Size = New Size(206, 63)
         Btn_Generate.TabIndex = 22
         Btn_Generate.Text = "Generate"
         Btn_Generate.UseVisualStyleBackColor = True
         ' 
         ' TextBox1
         ' 
-        TextBox1.Location = New Point(80, 316)
+        TextBox1.Location = New Point(12, 324)
         TextBox1.Name = "TextBox1"
         TextBox1.Size = New Size(125, 27)
         TextBox1.TabIndex = 25

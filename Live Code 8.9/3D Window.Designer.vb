@@ -53,27 +53,27 @@ Partial Class Form1
         ' 
         ' Btn_Reset
         ' 
-        Btn_Reset.Location = New Point(26, 152)
+        Btn_Reset.Location = New Point(12, 99)
         Btn_Reset.Name = "Btn_Reset"
-        Btn_Reset.Size = New Size(94, 48)
+        Btn_Reset.Size = New Size(182, 57)
         Btn_Reset.TabIndex = 0
         Btn_Reset.Text = "Reset"
         Btn_Reset.UseVisualStyleBackColor = True
         ' 
         ' Btn_Regenerate
         ' 
-        Btn_Regenerate.Location = New Point(26, 232)
+        Btn_Regenerate.Location = New Point(12, 162)
         Btn_Regenerate.Name = "Btn_Regenerate"
-        Btn_Regenerate.Size = New Size(94, 51)
+        Btn_Regenerate.Size = New Size(182, 61)
         Btn_Regenerate.TabIndex = 1
         Btn_Regenerate.Text = "Regenerate"
         Btn_Regenerate.UseVisualStyleBackColor = True
         ' 
         ' Btn_Orbit
         ' 
-        Btn_Orbit.Location = New Point(26, 316)
+        Btn_Orbit.Location = New Point(12, 229)
         Btn_Orbit.Name = "Btn_Orbit"
-        Btn_Orbit.Size = New Size(94, 51)
+        Btn_Orbit.Size = New Size(182, 60)
         Btn_Orbit.TabIndex = 2
         Btn_Orbit.Text = "Orbit"
         Btn_Orbit.UseVisualStyleBackColor = True
@@ -84,9 +84,9 @@ Partial Class Form1
         ' 
         ' Btn_Hide
         ' 
-        Btn_Hide.Location = New Point(26, 540)
+        Btn_Hide.Location = New Point(12, 295)
         Btn_Hide.Name = "Btn_Hide"
-        Btn_Hide.Size = New Size(94, 50)
+        Btn_Hide.Size = New Size(182, 60)
         Btn_Hide.TabIndex = 3
         Btn_Hide.Text = "Hide"
         Btn_Hide.UseVisualStyleBackColor = True

@@ -1,4 +1,5 @@
 ﻿Imports System
+Imports System.Drawing.Drawing2D
 Imports System.Math
 Imports System.Threading
 Imports Live_Code_8._9.Form1
@@ -12,7 +13,7 @@ Module Globals3D
 
 
     Public Const MapWidth As Integer = 49     'Must be an odd number 
-    Public Const MapDepth As Integer = 29     'Must be an odd number
+    Public Const MapDepth As Integer = 49     'Must be an odd number
     Public Const PointIncr As Integer = 5
     Public Const StartX As Integer = ((MapWidth / 2) * PointIncr * -1)
     Public Const StartZ As Integer = (MapDepth / 2) * PointIncr
@@ -20,8 +21,6 @@ Module Globals3D
 End Module
 Public Class Form1
     Dim rnd As New Random()
-
-
 
     Dim AngleY As Double = 0
     Dim AngleX As Double = 0
@@ -131,6 +130,7 @@ Public Class Form1
     Private Sub Form1_Paint(sender As Object, e As PaintEventArgs) Handles MyBase.Paint
         e.Graphics.Clear(Color.Black)
         Dim CustomBrush As New SolidBrush(LighterIndianRed)
+        e.Graphics.SmoothingMode = SmoothingMode.AntiAlias
 
         '///////////////// Draws lines \\\\\\\\\\\\\\\\\\\\
 
@@ -221,7 +221,6 @@ Public Class Form1
     End Function
 
     Sub PerspectiveProjection()
-
         For j = 0 To MapDepth
             For i = 0 To MapWidth
                 XpArray(i, j) = (OGPointArray(i, j).X / ((OGPointArray(i, j).Z + 200) * Tan(A / 2))) * 200
@@ -233,17 +232,12 @@ Public Class Form1
                 YpArray(i, j) = (OGPointArray(i, j).Y / ((OGPointArray(i, j).Z + 200) * Tan(A / 2))) * 200
             Next
         Next
-
-
     End Sub
-
 
     Function NotPerlinNoise(ByVal i As Integer, ByVal j As Integer) As Integer
         Dim YValue1 As Integer
         Dim YValue2 As Integer
         Dim NewYValue As Integer
-
-
 
         If i = 0 Or i = MapWidth Or j = 0 Or j = MapDepth Then
             NewYValue = 160
