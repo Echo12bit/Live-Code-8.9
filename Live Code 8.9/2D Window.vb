@@ -250,6 +250,7 @@ Public Class Form2
 
         If StartNodeInPos = True And EndNodeInPos = True Then
             NodesOnGridList.Remove(EndNode.Location)
+            TravelingSalesman()
             NodesOnGridList.Add(EndNode.Location)
             PathFinding()
         End If
@@ -339,5 +340,29 @@ Public Class Form2
 
     Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick
         ClickedButton.Location = New Point(Cursor.Position.X - 10, Cursor.Position.Y - 10)
+    End Sub
+
+    Sub TravelingSalesman()
+        For i = 0 To NodesOnGridList.Count - 2
+            Dim CurrentShortestDistance As Integer = 1000
+            Dim ShortestDistanceIndex As Integer
+            Dim TempPoint As Point
+            For j = i + 1 To NodesOnGridList.Count - 1
+                Dim StartPointX As Integer = NodesOnGridList(i).X + 10
+                Dim StartPointY As Integer = NodesOnGridList(i).Y + 10
+                Dim EndPointX As Integer = NodesOnGridList(j).X + 10
+                Dim EndPointY As Integer = NodesOnGridList(j).Y + 10
+                Dim XDifference As Integer = EndPointX - StartPointX
+                Dim YDifference As Integer = EndPointY - StartPointY
+
+                If Abs(XDifference) + Abs(YDifference) < CurrentShortestDistance Then
+                    CurrentShortestDistance = Abs(XDifference) + Abs(YDifference)
+                    ShortestDistanceIndex = j
+                End If
+            Next
+            TempPoint = NodesOnGridList(ShortestDistanceIndex)
+            NodesOnGridList.Remove(TempPoint)
+            NodesOnGridList.Insert(i + 1, TempPoint)
+        Next
     End Sub
 End Class
