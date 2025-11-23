@@ -5,7 +5,7 @@ Imports System.IO
 Module Globals2D
     Public PathPointArray(10000) As Point
     Public PathLength As Integer
-    Public PathMark(100, 100) As Boolean
+    Public PathMark As New List(Of Point)
 End Module
 
 Public Class Form2
@@ -26,6 +26,8 @@ Public Class Form2
 
     Dim ClickedButton As Button
 
+
+    Dim NodeList As New List(Of Button)
     Dim NodesOnGridList As New List(Of Point)
 
     Private Sub Form2_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -57,6 +59,8 @@ Public Class Form2
         PictureBox9.Size = New Size(Me.Width, 5)
         PictureBox10.Location = New Point(0, Me.Height + 37)
         PictureBox10.Size = New Size(Me.Width, 5)
+
+        CreateNode()
 
 
         Dim Path As New GraphicsPath()
@@ -93,14 +97,14 @@ Public Class Form2
     Sub ClearPath()
         TranslatedPathPointList.Clear()
         Array.Clear(PathPointArray, 0, PathPointArray.Length)
-        Array.Clear(PathMark, 0, PathMark.Length)
+        PathMark.Clear()
         PathLength = 0
         Me.Invalidate()
     End Sub
     Private Sub Form2_Paint(sender As Object, e As PaintEventArgs) Handles MyBase.Paint
         e.Graphics.Clear(Color.Black)
         Dim Pen2D As New Pen(Color.Brown, 0.5)
-        Dim PathPen As New Pen(Color.Red, 4)
+        Dim PathPen As New Pen(Color.Yellow, 4)
         e.Graphics.SmoothingMode = SmoothingMode.AntiAlias
 
         For j = 0 To MapDepth
@@ -206,28 +210,27 @@ Public Class Form2
                     PathLength += 1
                 Next
             End If
-
-
-            For i = 0 To PathLength - 1
-                PathPointArray(i) = TranslatedPathPointList(i)
-                PathPointArray(i) -= New Point(1100, 400)
-                PathPointArray(i).Y \= 4
-                PathPointArray(i).X \= 4
-                PathPointArray(i).Y = -PathPointArray(i).Y
-            Next
-
-
-            For j = 0 To MapDepth
-                For i = 0 To MapWidth
-                    For k = 0 To PathLength - 1
-                        If PathPointArray(k).X >= OGPointArray(i, j).X - 2 And PathPointArray(k).X <= OGPointArray(i, j).X + 2 And PathPointArray(k).Y >= OGPointArray(i, j).Z - 2 And PathPointArray(k).Y <= OGPointArray(i, j).Z + 2 Then
-                            PathMark(i, j) = True
-                        End If
-                    Next
-                Next
-            Next
         Next
 
+        For i = 0 To PathLength - 1
+            PathPointArray(i) = TranslatedPathPointList(i)
+            PathPointArray(i) -= New Point(1100, 400)
+            PathPointArray(i).Y \= 4
+            PathPointArray(i).X \= 4
+            PathPointArray(i).Y = -PathPointArray(i).Y
+        Next
+
+        For k = 0 To PathLength - 1
+            For j = 0 To MapDepth
+                For i = 0 To MapWidth
+                    If PathPointArray(k).X >= OGPointArray(i, j).X - 2 And PathPointArray(k).X <= OGPointArray(i, j).X + 2 And PathPointArray(k).Y >= OGPointArray(i, j).Z - 2 And PathPointArray(k).Y <= OGPointArray(i, j).Z + 2 Then
+                        PathMark.Add(New Point(i, j))
+                    End If
+
+                Next
+            Next
+
+        Next
 
         Me.Invalidate()
     End Sub
@@ -256,32 +259,6 @@ Public Class Form2
         End If
     End Sub
 
-    Private Sub TextBox1_TextChanged(sender As Object, e As EventArgs) Handles TextBox1.TextChanged
-        Dim Path3 As New GraphicsPath()
-        Path3.AddEllipse(0, 0, 20, 20)
-        Dim NodeArray(100) As Button
-        Dim NodeYLocation As Integer
-        Dim NodeXLocation As Integer
-
-        If Integer.TryParse(TextBox1.Text, NumOfNodes) AndAlso NumOfNodes > 0 AndAlso NumOfNodes <= 35 Then
-            For i = 0 To NumOfNodes - 1
-                NodeXLocation = i \ 5
-                NodeYLocation = i Mod 5
-
-                NodeArray(i) = New Button() With {
-                .Name = "Intermediate" & i.ToString,
-                .Location = New Point(850 + NodeXLocation * 80, 880 + NodeYLocation * 40),
-                .FlatStyle = FlatStyle.Flat,
-                .BackColor = Color.FromArgb(255, 0, 0),
-                .Region = New Region(Path3)
-                }
-                Me.Controls.Add(NodeArray(i))
-                NodeArray(i).BringToFront()
-                AddHandler NodeArray(i).Click, AddressOf Node_Click
-            Next
-        End If
-    End Sub
-
     Private Sub Node_Click(sender As Object, e As EventArgs)
         ClickedButton = DirectCast(sender, Button)
         Dim Tempi As Integer
@@ -299,6 +276,10 @@ Public Class Form2
                     Exit For
                 End If
             Next
+
+            If ClickedButton.Location = New Point(250, 600) Then
+                CreateNode()
+            End If
 
             If ClickedButton.Name = "StartNode" Then
                 StartNodeInPos = False
@@ -332,7 +313,19 @@ Public Class Form2
                     NodesOnGridList.Add(ClickedButton.Location)
                 End If
             Else
-                ClickedButton.Location = New Point(500, 900)
+
+                If ClickedButton.Name = "StartNode" Then
+
+                    ClickedButton.Location = New Point(500, 900)
+
+                ElseIf ClickedButton.Name = "EndNode" Then
+
+                    ClickedButton.Location = New Point(500, 950)
+                Else
+                    Me.Controls.Remove(NodeList(NodeList.Count - 1))
+                    NodeList.RemoveAt(NodeList.Count - 1)
+                    ClickedButton.Location = New Point(250, 600)
+                End If
             End If
             GeneralNodeSwitch = False
         End If
@@ -364,5 +357,37 @@ Public Class Form2
             NodesOnGridList.Remove(TempPoint)
             NodesOnGridList.Insert(i + 1, TempPoint)
         Next
+    End Sub
+
+    Private Sub Btn_Clear_Click(sender As Object, e As EventArgs) Handles Btn_Clear.Click
+
+        For i = NodeList.Count - 1 To 0 Step -1
+            Me.Controls.Remove(NodeList(i))
+            NodeList.RemoveAt(NodeList.Count - 1)
+        Next
+        StartNode.Location = New Point(500,900)
+        EndNode.Location = New Point(500, 950)
+
+        CreateNode()
+        ClearPath()
+    End Sub
+
+    Sub CreateNode()
+        Dim Path3 As New GraphicsPath()
+        Path3.AddEllipse(0, 0, 20, 20)
+
+        Dim TempBtn As New Button() With {
+                .Name = "Intermediate" & NodeList.Count.ToString,
+                .Location = New Point(250, 600),
+                .FlatStyle = FlatStyle.Flat,
+                .BackColor = Color.Yellow,
+                .Region = New Region(Path3)
+        }
+
+        NodeList.Add(TempBtn)
+        Me.Controls.Add(NodeList(NodeList.Count - 1))
+        NodeList(NodeList.Count - 1).BringToFront()
+        AddHandler NodeList(NodeList.Count - 1).Click, AddressOf Node_Click
+
     End Sub
 End Class

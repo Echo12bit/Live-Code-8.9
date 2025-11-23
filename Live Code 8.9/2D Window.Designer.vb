@@ -40,7 +40,7 @@ Partial Class Form2
         StartNode = New Button()
         EndNode = New Button()
         Btn_Generate = New Button()
-        TextBox1 = New TextBox()
+        Btn_Clear = New Button()
         CType(PictureBox1, ComponentModel.ISupportInitialize).BeginInit()
         CType(PictureBox2, ComponentModel.ISupportInitialize).BeginInit()
         CType(PictureBox3, ComponentModel.ISupportInitialize).BeginInit()
@@ -170,7 +170,7 @@ Partial Class Form2
         ' 
         ' Btn_Exit
         ' 
-        Btn_Exit.Location = New Point(12, 254)
+        Btn_Exit.Location = New Point(12, 323)
         Btn_Exit.Name = "Btn_Exit"
         Btn_Exit.Size = New Size(206, 57)
         Btn_Exit.TabIndex = 19
@@ -189,7 +189,7 @@ Partial Class Form2
         ' 
         ' EndNode
         ' 
-        EndNode.BackColor = Color.Fuchsia
+        EndNode.BackColor = Color.Red
         EndNode.FlatStyle = FlatStyle.Flat
         EndNode.Location = New Point(326, 299)
         EndNode.Name = "EndNode"
@@ -206,19 +206,21 @@ Partial Class Form2
         Btn_Generate.Text = "Generate"
         Btn_Generate.UseVisualStyleBackColor = True
         ' 
-        ' TextBox1
+        ' Btn_Clear
         ' 
-        TextBox1.Location = New Point(12, 324)
-        TextBox1.Name = "TextBox1"
-        TextBox1.Size = New Size(125, 27)
-        TextBox1.TabIndex = 25
+        Btn_Clear.Location = New Point(12, 254)
+        Btn_Clear.Name = "Btn_Clear"
+        Btn_Clear.Size = New Size(206, 63)
+        Btn_Clear.TabIndex = 26
+        Btn_Clear.Text = "Clear"
+        Btn_Clear.UseVisualStyleBackColor = True
         ' 
         ' Form2
         ' 
         AutoScaleDimensions = New SizeF(8F, 20F)
         AutoScaleMode = AutoScaleMode.Font
         ClientSize = New Size(1320, 703)
-        Controls.Add(TextBox1)
+        Controls.Add(Btn_Clear)
         Controls.Add(Btn_Generate)
         Controls.Add(EndNode)
         Controls.Add(StartNode)
@@ -269,5 +271,5 @@ Partial Class Form2
     Friend WithEvents StartNode As Button
     Friend WithEvents EndNode As Button
     Friend WithEvents Btn_Generate As Button
-    Friend WithEvents TextBox1 As TextBox
+    Friend WithEvents Btn_Clear As Button
 End Class

@@ -13,7 +13,7 @@ Module Globals3D
 
 
     Public Const MapWidth As Integer = 49     'Must be an odd number 
-    Public Const MapDepth As Integer = 49     'Must be an odd number
+    Public Const MapDepth As Integer = 29     'Must be an odd number
     Public Const PointIncr As Integer = 5
     Public Const StartX As Integer = ((MapWidth / 2) * PointIncr * -1)
     Public Const StartZ As Integer = (MapDepth / 2) * PointIncr
@@ -61,6 +61,10 @@ Public Class Form1
     End Structure
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        Form2.Show()
+        Me.Hide()
+        Me.Show()
+        Form2.Hide()
         Form2.Show()
         Me.Hide()
         PictureBox1.Size = New Size(300, Me.Height)
@@ -158,12 +162,7 @@ Public Class Form1
             For i = 0 To MapWidth - 1
                 GridPen.Color = Color.Wheat
                 GridPen.Width = 0.25
-                If PathMark(i, j) = True And PathMark(i + 1, j) = True Then
-                    GridPen.Color = Color.Red
-                    GridPen.Width = 4
-                    'e.Graphics.DrawLine(GridPen, NewPointArray(i, j), NewPointArray(i + 1, j))
-                End If
-                e.Graphics.DrawLine(GridPen, NewPointArray(i, j), NewPointArray(i + 1, j))
+                'e.Graphics.DrawLine(GridPen, NewPointArray(i, j), NewPointArray(i + 1, j))
             Next
         Next
 
@@ -171,12 +170,7 @@ Public Class Form1
             For j = 0 To MapDepth - 1
                 GridPen.Color = Color.Wheat
                 GridPen.Width = 0.25
-                If PathMark(i, j) = True And PathMark(i, j + 1) = True Then
-                    GridPen.Color = Color.Red
-                    GridPen.Width = 4
-                    'e.Graphics.DrawLine(GridPen, NewPointArray(i, j), NewPointArray(i, j + 1))
-                End If
-                e.Graphics.DrawLine(GridPen, NewPointArray(i, j), NewPointArray(i, j + 1))
+                'e.Graphics.DrawLine(GridPen, NewPointArray(i, j), NewPointArray(i, j + 1))
             Next
         Next
 
@@ -184,16 +178,21 @@ Public Class Form1
             For i = 0 To MapWidth - 1
                 GridPen.Color = Color.Wheat
                 GridPen.Width = 0.25
-                If PathMark(i + 1, j) = True And PathMark(i, j + 1) = True Then
-                    GridPen.Color = Color.Red
-                    GridPen.Width = 4
-                    'e.Graphics.DrawLine(GridPen, NewPointArray(i + 1, j), NewPointArray(i, j + 1))
-                End If
-                e.Graphics.DrawLine(GridPen, NewPointArray(i + 1, j), NewPointArray(i, j + 1))
+                'e.Graphics.DrawLine(GridPen, NewPointArray(i + 1, j), NewPointArray(i, j + 1))
             Next
         Next
 
-
+        GridPen.Width = 4
+        For i = 0 To PathMark.Count - 2
+            If i = 0 Then
+                GridPen.Color = Color.Lime
+            ElseIf i = PathMark.Count - 2 Then
+                GridPen.Color = Color.Red
+            Else
+                GridPen.Color = Color.Yellow
+            End If
+            e.Graphics.DrawLine(GridPen, NewPointArray(PathMark(i).X, PathMark(i).Y), NewPointArray(PathMark(i + 1).X, PathMark(i + 1).Y))
+        Next
     End Sub
 
     Public Function ColorGradient(ByVal i As Integer, ByVal j As Integer) As Color
@@ -369,6 +368,7 @@ Public Class Form1
     Private Sub Btn_Hide_Click(sender As Object, e As EventArgs) Handles Btn_Hide.Click
         Timer1.Stop()
         Reset()
+        OrbitSwitch = False
         Form2.Show()
         Me.Hide()
     End Sub

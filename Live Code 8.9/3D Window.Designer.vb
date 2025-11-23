@@ -23,7 +23,6 @@ Partial Class Form1
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         components = New ComponentModel.Container()
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Form1))
         Btn_Reset = New Button()
         Btn_Regenerate = New Button()
         Btn_Orbit = New Button()
@@ -40,7 +39,6 @@ Partial Class Form1
         PictureBox8 = New PictureBox()
         PictureBox7 = New PictureBox()
         PictureBox6 = New PictureBox()
-        PictureBox11 = New PictureBox()
         CType(PictureBox1, ComponentModel.ISupportInitialize).BeginInit()
         CType(PictureBox2, ComponentModel.ISupportInitialize).BeginInit()
         CType(PictureBox5, ComponentModel.ISupportInitialize).BeginInit()
@@ -51,7 +49,6 @@ Partial Class Form1
         CType(PictureBox8, ComponentModel.ISupportInitialize).BeginInit()
         CType(PictureBox7, ComponentModel.ISupportInitialize).BeginInit()
         CType(PictureBox6, ComponentModel.ISupportInitialize).BeginInit()
-        CType(PictureBox11, ComponentModel.ISupportInitialize).BeginInit()
         SuspendLayout()
         ' 
         ' Btn_Reset
@@ -196,22 +193,11 @@ Partial Class Form1
         PictureBox6.TabIndex = 22
         PictureBox6.TabStop = False
         ' 
-        ' PictureBox11
-        ' 
-        PictureBox11.ErrorImage = Nothing
-        PictureBox11.Image = CType(resources.GetObject("PictureBox11.Image"), Image)
-        PictureBox11.Location = New Point(525, 46)
-        PictureBox11.Name = "PictureBox11"
-        PictureBox11.Size = New Size(400, 471)
-        PictureBox11.TabIndex = 27
-        PictureBox11.TabStop = False
-        ' 
         ' Form1
         ' 
         AutoScaleDimensions = New SizeF(8F, 20F)
         AutoScaleMode = AutoScaleMode.Font
         ClientSize = New Size(1071, 640)
-        Controls.Add(PictureBox11)
         Controls.Add(PictureBox5)
         Controls.Add(PictureBox4)
         Controls.Add(PictureBox3)
@@ -240,7 +226,6 @@ Partial Class Form1
         CType(PictureBox8, ComponentModel.ISupportInitialize).EndInit()
         CType(PictureBox7, ComponentModel.ISupportInitialize).EndInit()
         CType(PictureBox6, ComponentModel.ISupportInitialize).EndInit()
-        CType(PictureBox11, ComponentModel.ISupportInitialize).EndInit()
         ResumeLayout(False)
         PerformLayout()
     End Sub
@@ -261,6 +246,5 @@ Partial Class Form1
     Friend WithEvents PictureBox8 As PictureBox
     Friend WithEvents PictureBox7 As PictureBox
     Friend WithEvents PictureBox6 As PictureBox
-    Friend WithEvents PictureBox11 As PictureBox
 
 End Class
