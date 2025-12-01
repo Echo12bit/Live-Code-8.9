@@ -5,18 +5,24 @@ Imports System.Threading
 Imports Live_Code_8._9.Form1
 
 Module Globals3D
-    Public OGPointArray(100, 100) As Point3D
-    Public XpArray(100, 100) As Double
-    Public YpArray(100, 100) As Double
-    Public NewPointArray(100, 100) As Point
-    Public YValue(100, 100) As Double
 
-
-    Public Const MapWidth As Integer = 49     'Must be an odd number 
-    Public Const MapDepth As Integer = 29     'Must be an odd number
+    Public Const MapWidth As Integer = 50     'Must be an even number
+    Public Const MapDepth As Integer = 30    'Must be an even number
     Public Const PointIncr As Integer = 5
     Public Const StartX As Integer = ((MapWidth / 2) * PointIncr * -1)
     Public Const StartZ As Integer = (MapDepth / 2) * PointIncr
+
+    Public OGPointArray(MapWidth, MapDepth) As Point3D
+    Public XpArray(MapWidth, MapDepth) As Double
+    Public YpArray(MapWidth, MapDepth) As Double
+    Public NewPointArray(MapWidth, MapDepth) As Point
+    Public YValue(MapWidth, MapDepth) As Double
+
+    Public Const ChunkSize As Integer = 5
+    Public Const XChunkAmount As Integer = MapWidth / ChunkSize
+    Public Const ZChunkAmount As Integer = MapDepth / ChunkSize
+
+    Public FinalElevationArray(MapWidth, MapDepth) As Double
 
 End Module
 Public Class Form1
@@ -25,7 +31,7 @@ Public Class Form1
     Dim AngleY As Double = 0
     Dim AngleX As Double = 0
     Const A As Double = PI / 4
-    'Must be an odd number 
+    'Must be an odd number
 
     Dim GridPen As New Pen(Color.IndianRed, 0.5)
     Dim MiddleBlue As Color = Color.FromArgb(86, 108, 242)
@@ -45,8 +51,8 @@ Public Class Form1
     Dim LB As Integer = 3
     Dim UB As Integer = 4
 
-    Dim TopTriangles(100, 100)() As Point
-    Dim BottemTriangles(100, 100)() As Point
+    Dim TopTriangles(MapWidth, MapDepth)() As Point
+    Dim BottemTriangles(MapWidth, MapDepth)() As Point
     Structure Point3D
         Public X As Double
         Public Y As Double
@@ -96,12 +102,14 @@ Public Class Form1
         PictureBox10.Size = New Size(Me.Width, 5)
 
 
+        PerlinNoise()
         For j = 0 To MapDepth
             For i = 0 To MapWidth
-                YValue(i, j) = NotPerlinNoise(i, j)
+                YValue(i, j) = (FinalElevationArray(i, j) * 30) + 135
                 OGPointArray(i, j) = New Point3D((StartX) + (i * PointIncr), YValue(i, j), StartZ - (j * PointIncr))
             Next
         Next
+
 
         PPand2DArray()
     End Sub
@@ -132,7 +140,7 @@ Public Class Form1
 
     End Sub
     Private Sub Form1_Paint(sender As Object, e As PaintEventArgs) Handles MyBase.Paint
-        e.Graphics.Clear(Color.Black)
+        'e.Graphics.Clear(Color.Black)
         Dim CustomBrush As New SolidBrush(LighterIndianRed)
         e.Graphics.SmoothingMode = SmoothingMode.AntiAlias
 
@@ -200,7 +208,7 @@ Public Class Form1
             Return Color.LightBlue
         ElseIf OGPointArray(i, j).Y >= 145 And OGPointArray(i, j).Y < 150 Then
             Return BetweenMiddleAndLightBlue
-        ElseIf OGPointArray(i, j).Y >= 150 And OGPointArray(i, j).Y < 160 Then
+        ElseIf OGPointArray(i, j).Y >= 150 And OGPointArray(i, j).Y < 157 Then
             Return MiddleBlue
         Else
             Return Color.Blue
@@ -212,7 +220,7 @@ Public Class Form1
             Return Color.FromArgb(150, 200, 220)
         ElseIf OGPointArray(i, j).Y >= 145 And OGPointArray(i, j).Y < 150 Then
             Return Color.FromArgb(115, 145, 220)
-        ElseIf OGPointArray(i, j).Y >= 150 And OGPointArray(i, j).Y < 160 Then
+        ElseIf OGPointArray(i, j).Y >= 150 And OGPointArray(i, j).Y < 157 Then
             Return Color.FromArgb(70, 95, 230)
         Else
             Return Color.FromArgb(0, 0, 220)
@@ -233,33 +241,141 @@ Public Class Form1
         Next
     End Sub
 
-    Function NotPerlinNoise(ByVal i As Integer, ByVal j As Integer) As Integer
-        Dim YValue1 As Integer
-        Dim YValue2 As Integer
-        Dim NewYValue As Integer
+    Sub PerlinNoise()
+        Dim rand As New Random()
+        Dim MaxVal As Double = 1.67 * ChunkSize
+        Dim CardinalDirectionArray(XChunkAmount, ZChunkAmount) As Integer
 
-        If i = 0 Or i = MapWidth Or j = 0 Or j = MapDepth Then
-            NewYValue = 160
-            Return NewYValue
-        Else
-            YValue1 = OGPointArray(i - 1, j).Y
-            YValue2 = OGPointArray(i, j - 1).Y
-            NewYValue = (YValue1 + YValue2) \ 2
+        For y = 0 To ZChunkAmount
+            For x = 0 To XChunkAmount
+                CardinalDirectionArray(x, y) = rand.Next(0, 12)
+            Next
+        Next
 
-        End If
-        If Switch = False Then
-            If NewYValue <= 140 Then
-                UB += 1
+        Dim TLElevationArray(MapWidth, MapDepth) As Double
+        Dim TRElevationArray(MapWidth, MapDepth) As Double
+        Dim BLElevationArray(MapWidth, MapDepth) As Double
+        Dim BRElevationArray(MapWidth, MapDepth) As Double
 
-            ElseIf NewYValue >= 170 Then
-                UB -= 1
-            End If
-            Switch = True
-        End If
+        Dim TLTRElevationArray(MapWidth, MapDepth) As Double
+        Dim BLBRElevationArray(MapWidth, MapDepth) As Double
 
-        'Return NewYValue
-        Return rnd.Next(NewYValue - LB, NewYValue + UB)
-    End Function
+
+        For y = 0 To ZChunkAmount - 1
+            For x = 0 To XChunkAmount - 1
+
+                For b1 = 0 To ChunkSize
+                    For a1 = 0 To ChunkSize
+
+                        TLElevationArray((x * ChunkSize) + a1, (y * ChunkSize) + b1) = (Cos((CardinalDirectionArray(x, y) * PI) / 6) * a1) + (Sin((CardinalDirectionArray(x, y) * PI) / 6) * b1)
+                        TRElevationArray((x * ChunkSize) + a1, (y * ChunkSize) + b1) = (Cos((CardinalDirectionArray(x + 1, y) * PI) / 6) * (ChunkSize - a1)) + (Sin((CardinalDirectionArray(x + 1, y) * PI) / 6) * b1)
+                        BLElevationArray((x * ChunkSize) + a1, (y * ChunkSize) + b1) = (Cos((CardinalDirectionArray(x, y + 1) * PI) / 6) * a1) + (Sin((CardinalDirectionArray(x, y + 1) * PI) / 6) * (ChunkSize - b1))
+                        BRElevationArray((x * ChunkSize) + a1, (y * ChunkSize) + b1) = (Cos((CardinalDirectionArray(x + 1, y + 1) * PI) / 6) * (ChunkSize - a1)) + (Sin((CardinalDirectionArray(x + 1, y + 1) * PI) / 6) * (ChunkSize - b1))
+                    Next
+                Next
+
+            Next
+        Next
+
+        Dim TopTempDifference As Double
+        Dim BottemTempDifference As Double
+        Dim MergeTempDifference As Double
+        Dim xf As Double
+
+
+        Dim Temp1 As Double
+        For y = 0 To MapDepth
+            For x = 0 To MapWidth
+
+                Temp1 = TLElevationArray(x, y)
+                xf = Abs((Temp1 + MaxVal) / (MaxVal * 2))
+                TLElevationArray(x, y) = 6 * (xf ^ 5) - 15 * (xf ^ 4) + 10 * (xf ^ 3)
+
+                Temp1 = TRElevationArray(x, y)
+                xf = Abs((Temp1 + MaxVal) / (MaxVal * 2))
+                TRElevationArray(x, y) = 6 * (xf ^ 5) - 15 * (xf ^ 4) + 10 * (xf ^ 3)
+
+                Temp1 = BLElevationArray(x, y)
+                xf = Abs((Temp1 + MaxVal) / (MaxVal * 2))
+                BLElevationArray(x, y) = 6 * (xf ^ 5) - 15 * (xf ^ 4) + 10 * (xf ^ 3)
+
+                Temp1 = BRElevationArray(x, y)
+                xf = Abs((Temp1 + MaxVal) / (MaxVal * 2))
+                BRElevationArray(x, y) = 6 * (xf ^ 5) - 15 * (xf ^ 4) + 10 * (xf ^ 3)
+            Next
+        Next
+
+
+
+        For y = 0 To ZChunkAmount - 1
+            For x = 0 To XChunkAmount - 1
+
+                For b1 = 0 To ChunkSize
+                    For a1 = 0 To ChunkSize
+
+                        TopTempDifference = TRElevationArray((x * ChunkSize) + a1, (y * ChunkSize) + b1) - TLElevationArray((x * ChunkSize) + a1, (y * ChunkSize) + b1)
+                        TLTRElevationArray((x * ChunkSize) + a1, (y * ChunkSize) + b1) = TLElevationArray((x * ChunkSize) + a1, (y * ChunkSize) + b1) + ((TopTempDifference / 5) * a1)
+
+                        BottemTempDifference = BRElevationArray((x * ChunkSize) + a1, (y * ChunkSize) + b1) - BLElevationArray((x * ChunkSize) + a1, (y * ChunkSize) + b1)
+                        BLBRElevationArray((x * ChunkSize) + a1, (y * ChunkSize) + b1) = BLElevationArray((x * ChunkSize) + a1, (y * ChunkSize) + b1) + ((BottemTempDifference / 5) * a1)
+
+                        MergeTempDifference = BLBRElevationArray((x * ChunkSize) + a1, (y * ChunkSize) + b1) - TLTRElevationArray((x * ChunkSize) + a1, (y * ChunkSize) + b1)
+                        FinalElevationArray((x * ChunkSize) + a1, (y * ChunkSize) + b1) = TLTRElevationArray((x * ChunkSize) + a1, (y * ChunkSize) + b1) + ((MergeTempDifference / 5) * a1)
+
+                    Next
+                Next
+            Next
+        Next
+
+        For y = 0 To ZChunkAmount - 1
+            For x = 0 To XChunkAmount - 1
+
+                For a1 = 0 To ChunkSize
+                    For b1 = 0 To ChunkSize
+
+                        MergeTempDifference = BLBRElevationArray((x * ChunkSize) + a1, (y * ChunkSize) + b1) - TLTRElevationArray((x * ChunkSize) + a1, (y * ChunkSize) + b1)
+                        FinalElevationArray((x * ChunkSize) + a1, (y * ChunkSize) + b1) = TLTRElevationArray((x * ChunkSize) + a1, (y * ChunkSize) + b1) + ((MergeTempDifference / 5) * a1)
+
+                    Next
+                Next
+            Next
+        Next
+
+
+        Dim TempAvg As Double
+        Dim a2 As Double
+        Dim b2 As Double
+        For y = 0 To MapDepth
+            For x = 0 To MapWidth
+
+                If x Mod ChunkSize = 0 And x <> 0 Then
+
+                    a2 = FinalElevationArray(x - 1, y)
+                    b2 = FinalElevationArray(x, y)
+                    TempAvg = (b2 - a2) / 4
+                    FinalElevationArray(x - 1, y) = TempAvg + a2
+                    FinalElevationArray(x, y) = b2 - TempAvg
+                End If
+            Next
+        Next
+
+        For x = 0 To MapWidth
+            For y = 0 To MapDepth
+
+                If y Mod ChunkSize = 0 And y <> 0 Then
+
+                    a2 = FinalElevationArray(x, y - 1)
+                    b2 = FinalElevationArray(x, y)
+                    TempAvg = (b2 - a2) / 4
+                    FinalElevationArray(x, y - 1) = TempAvg + a2
+                    FinalElevationArray(x, y) = b2 - TempAvg
+                End If
+            Next
+        Next
+
+
+
+    End Sub
 
     Sub RotateY()
         For j = 0 To MapDepth
@@ -336,9 +452,10 @@ Public Class Form1
     End Sub
 
     Private Sub Btn_Regenerate_Click(sender As Object, e As EventArgs) Handles Btn_Regenerate.Click
+        PerlinNoise()
         For j = 0 To MapDepth
             For i = 0 To MapWidth
-                YValue(i, j) = NotPerlinNoise(i, j)
+                YValue(i, j) = (FinalElevationArray(i, j) * 30) + 135
                 OGPointArray(i, j).Y = YValue(i, j)
             Next
         Next

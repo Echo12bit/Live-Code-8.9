@@ -23,6 +23,7 @@ Partial Class Form1
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         components = New ComponentModel.Container()
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Form1))
         Btn_Reset = New Button()
         Btn_Regenerate = New Button()
         Btn_Orbit = New Button()
@@ -39,6 +40,7 @@ Partial Class Form1
         PictureBox8 = New PictureBox()
         PictureBox7 = New PictureBox()
         PictureBox6 = New PictureBox()
+        Compass = New PictureBox()
         CType(PictureBox1, ComponentModel.ISupportInitialize).BeginInit()
         CType(PictureBox2, ComponentModel.ISupportInitialize).BeginInit()
         CType(PictureBox5, ComponentModel.ISupportInitialize).BeginInit()
@@ -49,6 +51,7 @@ Partial Class Form1
         CType(PictureBox8, ComponentModel.ISupportInitialize).BeginInit()
         CType(PictureBox7, ComponentModel.ISupportInitialize).BeginInit()
         CType(PictureBox6, ComponentModel.ISupportInitialize).BeginInit()
+        CType(Compass, ComponentModel.ISupportInitialize).BeginInit()
         SuspendLayout()
         ' 
         ' Btn_Reset
@@ -113,7 +116,7 @@ Partial Class Form1
         ' 
         Label1.AutoSize = True
         Label1.BackColor = Color.FromArgb(CByte(0), CByte(70), CByte(120))
-        Label1.Font = New Font("Arial", 18F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        Label1.Font = New Font("Arial", 18.0F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         Label1.ForeColor = SystemColors.ButtonHighlight
         Label1.Location = New Point(12, 29)
         Label1.Name = "Label1"
@@ -193,11 +196,24 @@ Partial Class Form1
         PictureBox6.TabIndex = 22
         PictureBox6.TabStop = False
         ' 
+        ' Compass
+        ' 
+        Compass.BackColor = Color.Transparent
+        Compass.Image = CType(resources.GetObject("Compass.Image"), Image)
+        Compass.Location = New Point(1200, 100)
+        Compass.Name = "Compass"
+        Compass.Size = New Size(150, 150)
+        Compass.SizeMode = PictureBoxSizeMode.Zoom
+        Compass.TabIndex = 27
+        Compass.TabStop = False
+        ' 
         ' Form1
         ' 
-        AutoScaleDimensions = New SizeF(8F, 20F)
+        AutoScaleDimensions = New SizeF(8.0F, 20.0F)
         AutoScaleMode = AutoScaleMode.Font
-        ClientSize = New Size(1071, 640)
+        BackgroundImage = My.Resources.Resources.grey_background_5
+        ClientSize = New Size(1500, 640)
+        Controls.Add(Compass)
         Controls.Add(PictureBox5)
         Controls.Add(PictureBox4)
         Controls.Add(PictureBox3)
@@ -226,6 +242,7 @@ Partial Class Form1
         CType(PictureBox8, ComponentModel.ISupportInitialize).EndInit()
         CType(PictureBox7, ComponentModel.ISupportInitialize).EndInit()
         CType(PictureBox6, ComponentModel.ISupportInitialize).EndInit()
+        CType(Compass, ComponentModel.ISupportInitialize).EndInit()
         ResumeLayout(False)
         PerformLayout()
     End Sub
@@ -246,5 +263,6 @@ Partial Class Form1
     Friend WithEvents PictureBox8 As PictureBox
     Friend WithEvents PictureBox7 As PictureBox
     Friend WithEvents PictureBox6 As PictureBox
+    Friend WithEvents Compass As PictureBox
 
 End Class

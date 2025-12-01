@@ -63,6 +63,46 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
+        Friend ReadOnly Property background_idea_1() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("background idea 1", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Bitmap.
+        '''</summary>
+        Friend ReadOnly Property compase_4() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("compase 4", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Bitmap.
+        '''</summary>
+        Friend ReadOnly Property grey_background_5() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("grey background 5", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Bitmap.
+        '''</summary>
+        Friend ReadOnly Property grey_dotted_background() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("grey dotted background", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Bitmap.
+        '''</summary>
         Friend ReadOnly Property pngtree_beautiful_compass_icon_free_png_transparent_layer_material_image_2290613() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("pngtree-beautiful-compass-icon-free-png-transparent-layer-material-image_2290613", resourceCulture)

@@ -219,6 +219,7 @@ Partial Class Form2
         ' 
         AutoScaleDimensions = New SizeF(8F, 20F)
         AutoScaleMode = AutoScaleMode.Font
+        BackgroundImage = My.Resources.Resources.grey_background_5
         ClientSize = New Size(1320, 703)
         Controls.Add(Btn_Clear)
         Controls.Add(Btn_Generate)

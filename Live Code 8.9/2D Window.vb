@@ -9,8 +9,8 @@ Module Globals2D
 End Module
 
 Public Class Form2
-    Dim PointArray2D(100, 100) As Point
-    Dim TranslatedPointArray2D(100, 100) As Point
+    Dim PointArray2D(MapWidth, MapDepth) As Point
+    Dim TranslatedPointArray2D(MapWidth, MapDepth) As Point
     Dim TranslatedPathPointList As New List(Of Point)
     Dim MouseX As Integer
     Dim MouseY As Integer
@@ -102,7 +102,7 @@ Public Class Form2
         Me.Invalidate()
     End Sub
     Private Sub Form2_Paint(sender As Object, e As PaintEventArgs) Handles MyBase.Paint
-        e.Graphics.Clear(Color.Black)
+        'e.Graphics.Clear(Color.Black)
         Dim Pen2D As New Pen(Color.Brown, 0.5)
         Dim PathPen As New Pen(Color.Yellow, 4)
         e.Graphics.SmoothingMode = SmoothingMode.AntiAlias
