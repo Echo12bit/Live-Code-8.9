@@ -6,11 +6,11 @@ Imports Live_Code_8._9.Form1
 
 Module Globals3D
 
-    Public Const MapWidth As Integer = 50     'Must be an even number
-    Public Const MapDepth As Integer = 30    'Must be an even number
-    Public Const PointIncr As Integer = 5
-    Public Const StartX As Integer = ((MapWidth / 2) * PointIncr * -1)
-    Public Const StartZ As Integer = (MapDepth / 2) * PointIncr
+    Public MapWidth As Integer = 50     'Must be an even number
+    Public MapDepth As Integer = 30    'Must be an even number
+    Public PointIncr As Integer = 5
+    Public StartX As Integer = ((MapWidth / 2) * PointIncr * -1)
+    Public StartZ As Integer = (MapDepth / 2) * PointIncr
 
     Public OGPointArray(MapWidth, MapDepth) As Point3D
     Public XpArray(MapWidth, MapDepth) As Double
@@ -18,11 +18,15 @@ Module Globals3D
     Public NewPointArray(MapWidth, MapDepth) As Point
     Public YValue(MapWidth, MapDepth) As Double
 
-    Public Const ChunkSize As Integer = 5
-    Public Const XChunkAmount As Integer = MapWidth / ChunkSize
-    Public Const ZChunkAmount As Integer = MapDepth / ChunkSize
+    Public ChunkSize As Integer = 5
+    Public XChunkAmount As Integer = MapWidth / ChunkSize
+    Public ZChunkAmount As Integer = MapDepth / ChunkSize
 
     Public FinalElevationArray(MapWidth, MapDepth) As Double
+
+    Public TopTriangles(MapWidth, MapDepth)() As Point
+    Public BottemTriangles(MapWidth, MapDepth)() As Point
+
 
 End Module
 Public Class Form1
@@ -47,12 +51,11 @@ Public Class Form1
 
     Dim OrbitSwitch As Boolean = False
 
-    Dim Switch As Boolean = False
-    Dim LB As Integer = 3
-    Dim UB As Integer = 4
+    Dim compass As Bitmap
+    Dim CompassAngle As Double
+    Dim compassBool As Boolean
+    Dim TotalAngle As Double
 
-    Dim TopTriangles(MapWidth, MapDepth)() As Point
-    Dim BottemTriangles(MapWidth, MapDepth)() As Point
     Structure Point3D
         Public X As Double
         Public Y As Double
@@ -102,17 +105,16 @@ Public Class Form1
         PictureBox10.Size = New Size(Me.Width, 5)
 
 
-        PerlinNoise()
-        For j = 0 To MapDepth
-            For i = 0 To MapWidth
-                YValue(i, j) = (FinalElevationArray(i, j) * 30) + 135
-                OGPointArray(i, j) = New Point3D((StartX) + (i * PointIncr), YValue(i, j), StartZ - (j * PointIncr))
-            Next
-        Next
-
+        compass = New Bitmap("C:\Users\ngree\Documents\Sam's folder\VB code (on laptop)\NEA Stuff\Compase 5.png")
+        compass = New Bitmap(compass, 200, 200)
 
         PPand2DArray()
     End Sub
+
+    Private Sub Form1_Activated(sender As Object, e As EventArgs) Handles Me.Activated
+        PPand2DArray()
+    End Sub
+
     Sub PPand2DArray()
         PerspectiveProjection()
 
@@ -139,8 +141,9 @@ Public Class Form1
         Next
 
     End Sub
+
     Private Sub Form1_Paint(sender As Object, e As PaintEventArgs) Handles MyBase.Paint
-        'e.Graphics.Clear(Color.Black)
+        e.Graphics.Clear(Color.Black)
         Dim CustomBrush As New SolidBrush(LighterIndianRed)
         e.Graphics.SmoothingMode = SmoothingMode.AntiAlias
 
@@ -201,6 +204,27 @@ Public Class Form1
             End If
             e.Graphics.DrawLine(GridPen, NewPointArray(PathMark(i).X, PathMark(i).Y), NewPointArray(PathMark(i + 1).X, PathMark(i + 1).Y))
         Next
+    End Sub
+
+    Protected Overrides Sub OnPaint(e As PaintEventArgs)
+        If compassBool Then
+            TotalAngle = 0
+            CompassAngle = 0
+            compassBool = False
+        End If
+
+        CompassAngle = TotalAngle * (180 / PI)
+        MyBase.OnPaint(e)
+        Dim g = e.Graphics
+
+        Dim CentreX As Integer = 1750
+        Dim CentreY As Integer = 150
+
+        g.TranslateTransform(CentreX, CentreY)
+        g.RotateTransform(CompassAngle)
+        g.TranslateTransform(-compass.Width \ 2, -compass.Height \ 2)
+
+        g.DrawImage(compass, 0, 0)
     End Sub
 
     Public Function ColorGradient(ByVal i As Integer, ByVal j As Integer) As Color
@@ -387,7 +411,6 @@ Public Class Form1
                 OGPointArray(i, j).Z = (TempZ * Cos(AngleY)) - (TempX * Sin(AngleY))
             Next
         Next
-
         PPand2DArray()
     End Sub
 
@@ -424,7 +447,9 @@ Public Class Form1
 
             If LeftClickDetect = True Then
                 AngleY = MouseXMovement * 0.002
+                TotalAngle += AngleY
                 RotateY()
+
             ElseIf RightClickDetect = True Then
                 AngleX = MouseYMovement * 0.002
                 RotateX()
@@ -438,6 +463,7 @@ Public Class Form1
     Private Sub Form1_MouseUp(sender As Object, e As MouseEventArgs) Handles Me.MouseUp
         LeftClickDetect = False
         RightClickDetect = False
+        MouseDragging = False
     End Sub
 
     Private Sub Form1_MouseWheel(sender As Object, e As MouseEventArgs) Handles Me.MouseWheel
@@ -478,6 +504,7 @@ Public Class Form1
 
     Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick
         AngleY = 0.002
+        TotalAngle += AngleY
         RotateY()
         Me.Invalidate()
     End Sub
@@ -496,8 +523,9 @@ Public Class Form1
                 OGPointArray(i, j) = New Point3D((StartX) + (i * PointIncr), YValue(i, j), StartZ - (j * PointIncr))
             Next
         Next
-
         PPand2DArray()
         Me.Invalidate()
+        compassBool = True
     End Sub
+
 End Class

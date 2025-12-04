@@ -1,11 +1,13 @@
 ﻿Imports System.Math
 Imports System.Drawing.Drawing2D
 Imports System.IO
+Imports Live_Code_8._9.Form1
 
 Module Globals2D
     Public PathPointArray(10000) As Point
     Public PathLength As Integer
     Public PathMark As New List(Of Point)
+
 End Module
 
 Public Class Form2
@@ -29,6 +31,17 @@ Public Class Form2
 
     Dim NodeList As New List(Of Button)
     Dim NodesOnGridList As New List(Of Point)
+
+
+    Const MapWidthBound = 1500
+    Const MapDepthBound = 760
+    Dim StartMapX As Integer
+    Dim StartMapY As Integer
+    Dim TempSFWidth As Integer
+    Dim TempSFDepth As Integer
+    Dim TwoDScaleFactor As Integer
+    Dim TranslatedStartX As Integer
+    Dim TranslatedStartY As Integer
 
     Private Sub Form2_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.BackColor = Color.White
@@ -75,34 +88,87 @@ Public Class Form2
 
         '\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\----////////////////////////////////////////
 
-        For j = 0 To MapDepth
-            For i = 0 To MapWidth
-                PointArray2D(i, j) = New Point((StartX) + (i * PointIncr), (StartZ * -1) + (j * PointIncr))             'PointArray2D(i, j) = New Point((i * 20) + 600, (j * 20) + 100)
-            Next
-        Next
-
-        For j = 0 To MapDepth
-            For i = 0 To MapWidth
-                TranslatedPointArray2D(i, j) = PointArray2D(i, j)
-                TranslatedPointArray2D(i, j).X *= 4
-                TranslatedPointArray2D(i, j).Y *= 4
-                TranslatedPointArray2D(i, j) += New Point(1100, 400)
-            Next
-        Next
-
         AddHandler StartNode.Click, AddressOf Node_Click
         AddHandler EndNode.Click, AddressOf Node_Click
+
+        Formalities2d()
+
     End Sub
 
-    Sub ClearPath()
-        TranslatedPathPointList.Clear()
-        Array.Clear(PathPointArray, 0, PathPointArray.Length)
-        PathMark.Clear()
-        PathLength = 0
+    Sub Formalities2d()
+
+        '////////////////////////////// ReSize Form 1 Variables \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+        ReDim PointArray2D(MapWidth, MapDepth)
+        ReDim TranslatedPointArray2D(MapWidth, MapDepth)
+        ReDim OGPointArray(MapWidth, MapDepth)
+        ReDim XpArray(MapWidth, MapDepth)
+        ReDim YpArray(MapWidth, MapDepth)
+        ReDim NewPointArray(MapWidth, MapDepth)
+        ReDim YValue(MapWidth, MapDepth)
+        ReDim FinalElevationArray(MapWidth, MapDepth)
+        ReDim TopTriangles(MapWidth, MapDepth)
+        ReDim BottemTriangles(MapWidth, MapDepth)
+
+
+
+        StartX = ((MapWidth / 2) * PointIncr * -1)
+        StartZ = (MapDepth / 2) * PointIncr
+
+
+        XChunkAmount = MapWidth / ChunkSize
+        ZChunkAmount = MapDepth / ChunkSize
+        '\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\----------------////////////////////////////////////////
+
+
+
+        '////////////////////////////// ReSize Form 2 Variables \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+        ReDim PointArray2D(MapWidth, MapDepth)
+        TempSFWidth = MapWidthBound \ MapWidth
+        TempSFDepth = MapDepthBound \ MapDepth
+
+        If TempSFDepth < TempSFWidth Then
+            TwoDScaleFactor = TempSFDepth
+        Else
+            TwoDScaleFactor = TempSFWidth
+        End If
+
+        TranslatedStartX = (MapWidth / 2) * TwoDScaleFactor * -1
+        TranslatedStartY = (MapDepth / 2) * TwoDScaleFactor
+
+        StartMapX = ((MapWidthBound - (MapWidth * TwoDScaleFactor)) \ 2) + 340
+        StartMapY = ((MapDepthBound - (MapDepth * TwoDScaleFactor)) \ 2) + 40
+
+
+        For j = 0 To MapDepth
+            For i = 0 To MapWidth
+                PointArray2D(i, j) = New Point((StartX) + (i * PointIncr), (StartZ * -1) + (j * PointIncr))
+            Next
+        Next
+
+
+        For j = 0 To MapDepth
+            For i = 0 To MapWidth
+                TranslatedPointArray2D(i, j) = New Point((StartMapX) + (i * TwoDScaleFactor), (StartMapY) + (j * TwoDScaleFactor))
+            Next
+        Next
+        '\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\----------------////////////////////////////////////////
+
+
+
+        Form1.PerlinNoise()
+
+        For j = 0 To MapDepth
+            For i = 0 To MapWidth
+                YValue(i, j) = (FinalElevationArray(i, j) * 30) + 135
+                OGPointArray(i, j) = New Point3D((StartX) + (i * PointIncr), YValue(i, j), StartZ - (j * PointIncr))
+            Next
+        Next
+
         Me.Invalidate()
     End Sub
+
     Private Sub Form2_Paint(sender As Object, e As PaintEventArgs) Handles MyBase.Paint
-        'e.Graphics.Clear(Color.Black)
+        e.Graphics.Clear(Color.Black)
         Dim Pen2D As New Pen(Color.Brown, 0.5)
         Dim PathPen As New Pen(Color.Yellow, 4)
         e.Graphics.SmoothingMode = SmoothingMode.AntiAlias
@@ -134,7 +200,6 @@ Public Class Form2
     End Sub
 
     Sub PathFinding()
-        ClearPath()
         For l = 0 To NodesOnGridList.Count - 2
             Dim StartPointX As Integer = NodesOnGridList(l).X + 10
             Dim StartPointY As Integer = NodesOnGridList(l).Y + 10
@@ -147,23 +212,19 @@ Public Class Form2
 
                 If Abs(XDifference) <= Abs(YDifference) Then
 
-                    For i = 0 To Abs(XDifference) / 20
-                        TranslatedPathPointList.Add(New Point(StartPointX + (i * 20), StartPointY - (i * 20)))
-                        PathLength += 1
+                    For i = 0 To Abs(XDifference) / TwoDScaleFactor
+                        TranslatedPathPointList.Add(New Point(StartPointX + (i * TwoDScaleFactor), StartPointY - (i * TwoDScaleFactor)))
                     Next
-                    For i = 1 To (Abs(YDifference) - Abs(XDifference)) / 20
-                        TranslatedPathPointList.Add(New Point(EndPointX, (StartPointY - Abs(XDifference)) - (i * 20)))
-                        PathLength += 1
+                    For i = 1 To (Abs(YDifference) - Abs(XDifference)) / TwoDScaleFactor
+                        TranslatedPathPointList.Add(New Point(EndPointX, (StartPointY - Abs(XDifference)) - (i * TwoDScaleFactor)))
                     Next
                 Else
 
-                    For i = 0 To Abs(YDifference) / 20
-                        TranslatedPathPointList.Add(New Point(StartPointX + (i * 20), StartPointY - (i * 20)))
-                        PathLength += 1
+                    For i = 0 To Abs(YDifference) / TwoDScaleFactor
+                        TranslatedPathPointList.Add(New Point(StartPointX + (i * TwoDScaleFactor), StartPointY - (i * TwoDScaleFactor)))
                     Next
-                    For i = 1 To (Abs(XDifference) - Abs(YDifference)) / 20
-                        TranslatedPathPointList.Add(New Point((StartPointX + Abs(YDifference)) + (i * 20), EndPointY))
-                        PathLength += 1
+                    For i = 1 To (Abs(XDifference) - Abs(YDifference)) / TwoDScaleFactor
+                        TranslatedPathPointList.Add(New Point((StartPointX + Abs(YDifference)) + (i * TwoDScaleFactor), EndPointY))
                     Next
                 End If
 
@@ -171,52 +232,48 @@ Public Class Form2
 
                 If Abs(XDifference) <= Abs(YDifference) Then
 
-                    For i = 0 To Abs(XDifference) / 20
-                        TranslatedPathPointList.Add(New Point(StartPointX - (i * 20), StartPointY + (i * 20)))
-                        PathLength += 1
+                    For i = 0 To Abs(XDifference) / TwoDScaleFactor
+                        TranslatedPathPointList.Add(New Point(StartPointX - (i * TwoDScaleFactor), StartPointY + (i * TwoDScaleFactor)))
                     Next
-                    For i = 1 To (Abs(YDifference) - Abs(XDifference)) / 20
-                        TranslatedPathPointList.Add(New Point(EndPointX, (StartPointY + Abs(XDifference)) + (i * 20)))
-                        PathLength += 1
+                    For i = 1 To (Abs(YDifference) - Abs(XDifference)) / TwoDScaleFactor
+                        TranslatedPathPointList.Add(New Point(EndPointX, (StartPointY + Abs(XDifference)) + (i * TwoDScaleFactor)))
                     Next
                 Else
 
-                    For i = 0 To Abs(YDifference) / 20
-                        TranslatedPathPointList.Add(New Point(StartPointX - (i * 20), StartPointY + (i * 20)))
-                        PathLength += 1
+                    For i = 0 To Abs(YDifference) / TwoDScaleFactor
+                        TranslatedPathPointList.Add(New Point(StartPointX - (i * TwoDScaleFactor), StartPointY + (i * TwoDScaleFactor)))
                     Next
-                    For i = 1 To (Abs(XDifference) - Abs(YDifference)) / 20
-                        TranslatedPathPointList.Add(New Point((StartPointX - Abs(YDifference)) - (i * 20), EndPointY))
-                        PathLength += 1
+                    For i = 1 To (Abs(XDifference) - Abs(YDifference)) / TwoDScaleFactor
+                        TranslatedPathPointList.Add(New Point((StartPointX - Abs(YDifference)) - (i * TwoDScaleFactor), EndPointY))
                     Next
 
                 End If
             ElseIf XDifference > 0 And YDifference > 0 Then
-                For i = 0 To Abs(XDifference) / 20
-                    TranslatedPathPointList.Add(New Point(StartPointX + (i * 20), StartPointY))
-                    PathLength += 1
+                For i = 0 To Abs(XDifference) / TwoDScaleFactor
+                    TranslatedPathPointList.Add(New Point(StartPointX + (i * TwoDScaleFactor), StartPointY))
                 Next
-                For i = 1 To Abs(YDifference) / 20
-                    TranslatedPathPointList.Add(New Point(EndPointX, StartPointY + (i * 20)))
-                    PathLength += 1
+                For i = 1 To Abs(YDifference) / TwoDScaleFactor
+                    TranslatedPathPointList.Add(New Point(EndPointX, StartPointY + (i * TwoDScaleFactor)))
                 Next
             ElseIf XDifference < 0 And YDifference < 0 Then
-                For i = 0 To Abs(XDifference) / 20
-                    TranslatedPathPointList.Add(New Point(StartPointX - (i * 20), StartPointY))
-                    PathLength += 1
+                For i = 0 To Abs(XDifference) / TwoDScaleFactor
+                    TranslatedPathPointList.Add(New Point(StartPointX - (i * TwoDScaleFactor), StartPointY))
                 Next
-                For i = 1 To Abs(YDifference) / 20
-                    TranslatedPathPointList.Add(New Point(EndPointX, StartPointY - (i * 20)))
-                    PathLength += 1
+                For i = 1 To Abs(YDifference) / TwoDScaleFactor
+                    TranslatedPathPointList.Add(New Point(EndPointX, StartPointY - (i * TwoDScaleFactor)))
                 Next
             End If
         Next
 
+        PathLength = TranslatedPathPointList.Count
+
         For i = 0 To PathLength - 1
             PathPointArray(i) = TranslatedPathPointList(i)
-            PathPointArray(i) -= New Point(1100, 400)
-            PathPointArray(i).Y \= 4
-            PathPointArray(i).X \= 4
+            PathPointArray(i) -= New Point(StartMapX + ((MapWidth * TwoDScaleFactor) / 2), StartMapY + ((MapDepth * TwoDScaleFactor) / 2))
+            PathPointArray(i).Y /= TwoDScaleFactor
+            PathPointArray(i).X /= TwoDScaleFactor
+            PathPointArray(i).Y *= PointIncr
+            PathPointArray(i).X *= PointIncr
             PathPointArray(i).Y = -PathPointArray(i).Y
         Next
 
@@ -290,10 +347,10 @@ Public Class Form2
             GeneralNodeSwitch = True
         Else
             Timer1.Stop()
-            If ClickedButton.Location.X >= 612 And ClickedButton.Location.X <= 1590 And ClickedButton.Location.Y >= 110 And ClickedButton.Location.Y <= 690 Then
+            If ClickedButton.Location.X >= StartMapX And ClickedButton.Location.X <= (StartMapX + (MapWidth * TwoDScaleFactor)) And ClickedButton.Location.Y >= StartMapY And ClickedButton.Location.Y <= (StartMapY + (MapDepth * TwoDScaleFactor)) Then
                 For j = 0 To MapDepth
                     For i = 0 To MapWidth
-                        If Abs((ClickedButton.Location.X + 10) - TranslatedPointArray2D(i, j).X) <= 10 And Abs((ClickedButton.Location.Y + 10) - TranslatedPointArray2D(i, j).Y) <= 10 Then
+                        If Abs((ClickedButton.Location.X + 10) - TranslatedPointArray2D(i, j).X) <= (TwoDScaleFactor / 2) And Abs((ClickedButton.Location.Y + 10) - TranslatedPointArray2D(i, j).Y) <= (TwoDScaleFactor / 2) Then
                             Tempi = i
                             Tempj = j
                         End If
@@ -358,18 +415,33 @@ Public Class Form2
             NodesOnGridList.Insert(i + 1, TempPoint)
         Next
     End Sub
+    Sub ClearPath()
+        TranslatedPathPointList.Clear()
+        PathMark.Clear()
+        Array.Clear(PathPointArray, 0, PathPointArray.Length)
+        PathLength = 0
+        Me.Invalidate()
+    End Sub
 
-    Private Sub Btn_Clear_Click(sender As Object, e As EventArgs) Handles Btn_Clear.Click
-
+    Sub ClearNodes()
         For i = NodeList.Count - 1 To 0 Step -1
             Me.Controls.Remove(NodeList(i))
             NodeList.RemoveAt(NodeList.Count - 1)
         Next
-        StartNode.Location = New Point(500,900)
+        StartNode.Location = New Point(500, 900)
         EndNode.Location = New Point(500, 950)
-
-        CreateNode()
         ClearPath()
+        CreateNode()
+
+        NodesOnGridList.Clear()
+
+
+    End Sub
+
+    Private Sub Btn_Clear_Click(sender As Object, e As EventArgs) Handles Btn_Clear.Click
+
+        ClearNodes()
+
     End Sub
 
     Sub CreateNode()
@@ -389,5 +461,29 @@ Public Class Form2
         NodeList(NodeList.Count - 1).BringToFront()
         AddHandler NodeList(NodeList.Count - 1).Click, AddressOf Node_Click
 
+    End Sub
+
+    Private Sub Btn_WidthDown_Click(sender As Object, e As EventArgs) Handles Btn_WidthDown.Click
+        MapWidth -= 10
+        Formalities2d()
+        ClearNodes()
+    End Sub
+
+    Private Sub Btn_WidthUp_Click(sender As Object, e As EventArgs) Handles Btn_WidthUp.Click
+        MapWidth += 10
+        Formalities2d()
+        ClearNodes()
+    End Sub
+
+    Private Sub Btn_DepthDown_Click(sender As Object, e As EventArgs) Handles Btn_DepthDown.Click
+        MapDepth -= 10
+        Formalities2d()
+        ClearNodes()
+    End Sub
+
+    Private Sub Btn_DepthUp_Click(sender As Object, e As EventArgs) Handles Btn_DepthUp.Click
+        MapDepth += 10
+        Formalities2d()
+        ClearNodes()
     End Sub
 End Class

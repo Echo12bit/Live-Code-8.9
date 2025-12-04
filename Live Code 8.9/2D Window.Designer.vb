@@ -41,6 +41,10 @@ Partial Class Form2
         EndNode = New Button()
         Btn_Generate = New Button()
         Btn_Clear = New Button()
+        Btn_WidthDown = New Button()
+        Btn_DepthDown = New Button()
+        Btn_WidthUp = New Button()
+        Btn_DepthUp = New Button()
         CType(PictureBox1, ComponentModel.ISupportInitialize).BeginInit()
         CType(PictureBox2, ComponentModel.ISupportInitialize).BeginInit()
         CType(PictureBox3, ComponentModel.ISupportInitialize).BeginInit()
@@ -56,7 +60,7 @@ Partial Class Form2
         ' PictureBox1
         ' 
         PictureBox1.BackColor = Color.FromArgb(CByte(0), CByte(70), CByte(120))
-        PictureBox1.Location = New Point(5, 5)
+        PictureBox1.Location = New Point(-1, 0)
         PictureBox1.Name = "PictureBox1"
         PictureBox1.Size = New Size(277, 710)
         PictureBox1.TabIndex = 0
@@ -215,12 +219,51 @@ Partial Class Form2
         Btn_Clear.Text = "Clear"
         Btn_Clear.UseVisualStyleBackColor = True
         ' 
+        ' Btn_WidthDown
+        ' 
+        Btn_WidthDown.Location = New Point(27, 413)
+        Btn_WidthDown.Name = "Btn_WidthDown"
+        Btn_WidthDown.Size = New Size(70, 39)
+        Btn_WidthDown.TabIndex = 27
+        Btn_WidthDown.Text = "Down"
+        Btn_WidthDown.UseVisualStyleBackColor = True
+        ' 
+        ' Btn_DepthDown
+        ' 
+        Btn_DepthDown.Location = New Point(27, 471)
+        Btn_DepthDown.Name = "Btn_DepthDown"
+        Btn_DepthDown.Size = New Size(70, 39)
+        Btn_DepthDown.TabIndex = 29
+        Btn_DepthDown.Text = "Down"
+        Btn_DepthDown.UseVisualStyleBackColor = True
+        ' 
+        ' Btn_WidthUp
+        ' 
+        Btn_WidthUp.Location = New Point(103, 413)
+        Btn_WidthUp.Name = "Btn_WidthUp"
+        Btn_WidthUp.Size = New Size(70, 39)
+        Btn_WidthUp.TabIndex = 30
+        Btn_WidthUp.Text = "Up"
+        Btn_WidthUp.UseVisualStyleBackColor = True
+        ' 
+        ' Btn_DepthUp
+        ' 
+        Btn_DepthUp.Location = New Point(103, 471)
+        Btn_DepthUp.Name = "Btn_DepthUp"
+        Btn_DepthUp.Size = New Size(70, 39)
+        Btn_DepthUp.TabIndex = 31
+        Btn_DepthUp.Text = "Up"
+        Btn_DepthUp.UseVisualStyleBackColor = True
+        ' 
         ' Form2
         ' 
         AutoScaleDimensions = New SizeF(8F, 20F)
         AutoScaleMode = AutoScaleMode.Font
-        BackgroundImage = My.Resources.Resources.grey_background_5
         ClientSize = New Size(1320, 703)
+        Controls.Add(Btn_DepthUp)
+        Controls.Add(Btn_WidthUp)
+        Controls.Add(Btn_DepthDown)
+        Controls.Add(Btn_WidthDown)
         Controls.Add(Btn_Clear)
         Controls.Add(Btn_Generate)
         Controls.Add(EndNode)
@@ -273,4 +316,8 @@ Partial Class Form2
     Friend WithEvents EndNode As Button
     Friend WithEvents Btn_Generate As Button
     Friend WithEvents Btn_Clear As Button
+    Friend WithEvents Btn_WidthDown As Button
+    Friend WithEvents Btn_DepthDown As Button
+    Friend WithEvents Btn_WidthUp As Button
+    Friend WithEvents Btn_DepthUp As Button
 End Class
