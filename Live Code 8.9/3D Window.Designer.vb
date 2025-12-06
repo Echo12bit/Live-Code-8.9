@@ -31,24 +31,20 @@ Partial Class Form1
         PictureBox1 = New PictureBox()
         PictureBox2 = New PictureBox()
         Label1 = New Label()
-        PictureBox5 = New PictureBox()
         PictureBox4 = New PictureBox()
         PictureBox3 = New PictureBox()
         PictureBox10 = New PictureBox()
         PictureBox9 = New PictureBox()
         PictureBox8 = New PictureBox()
         PictureBox7 = New PictureBox()
-        PictureBox6 = New PictureBox()
         CType(PictureBox1, ComponentModel.ISupportInitialize).BeginInit()
         CType(PictureBox2, ComponentModel.ISupportInitialize).BeginInit()
-        CType(PictureBox5, ComponentModel.ISupportInitialize).BeginInit()
         CType(PictureBox4, ComponentModel.ISupportInitialize).BeginInit()
         CType(PictureBox3, ComponentModel.ISupportInitialize).BeginInit()
         CType(PictureBox10, ComponentModel.ISupportInitialize).BeginInit()
         CType(PictureBox9, ComponentModel.ISupportInitialize).BeginInit()
         CType(PictureBox8, ComponentModel.ISupportInitialize).BeginInit()
         CType(PictureBox7, ComponentModel.ISupportInitialize).BeginInit()
-        CType(PictureBox6, ComponentModel.ISupportInitialize).BeginInit()
         SuspendLayout()
         ' 
         ' Btn_Reset
@@ -121,15 +117,6 @@ Partial Class Form1
         Label1.TabIndex = 7
         Label1.Text = "EIGER MESH 3D"
         ' 
-        ' PictureBox5
-        ' 
-        PictureBox5.BackColor = Color.Yellow
-        PictureBox5.Location = New Point(468, 149)
-        PictureBox5.Name = "PictureBox5"
-        PictureBox5.Size = New Size(5, 342)
-        PictureBox5.TabIndex = 21
-        PictureBox5.TabStop = False
-        ' 
         ' PictureBox4
         ' 
         PictureBox4.BackColor = Color.Yellow
@@ -184,28 +171,17 @@ Partial Class Form1
         PictureBox7.TabIndex = 23
         PictureBox7.TabStop = False
         ' 
-        ' PictureBox6
-        ' 
-        PictureBox6.BackColor = Color.Yellow
-        PictureBox6.Location = New Point(514, 149)
-        PictureBox6.Name = "PictureBox6"
-        PictureBox6.Size = New Size(5, 342)
-        PictureBox6.TabIndex = 22
-        PictureBox6.TabStop = False
-        ' 
         ' Form1
         ' 
         AutoScaleDimensions = New SizeF(8F, 20F)
         AutoScaleMode = AutoScaleMode.Font
         ClientSize = New Size(1500, 640)
-        Controls.Add(PictureBox5)
         Controls.Add(PictureBox4)
         Controls.Add(PictureBox3)
         Controls.Add(PictureBox10)
         Controls.Add(PictureBox9)
         Controls.Add(PictureBox8)
         Controls.Add(PictureBox7)
-        Controls.Add(PictureBox6)
         Controls.Add(Label1)
         Controls.Add(PictureBox2)
         Controls.Add(Btn_Hide)
@@ -218,14 +194,12 @@ Partial Class Form1
         WindowState = FormWindowState.Maximized
         CType(PictureBox1, ComponentModel.ISupportInitialize).EndInit()
         CType(PictureBox2, ComponentModel.ISupportInitialize).EndInit()
-        CType(PictureBox5, ComponentModel.ISupportInitialize).EndInit()
         CType(PictureBox4, ComponentModel.ISupportInitialize).EndInit()
         CType(PictureBox3, ComponentModel.ISupportInitialize).EndInit()
         CType(PictureBox10, ComponentModel.ISupportInitialize).EndInit()
         CType(PictureBox9, ComponentModel.ISupportInitialize).EndInit()
         CType(PictureBox8, ComponentModel.ISupportInitialize).EndInit()
         CType(PictureBox7, ComponentModel.ISupportInitialize).EndInit()
-        CType(PictureBox6, ComponentModel.ISupportInitialize).EndInit()
         ResumeLayout(False)
         PerformLayout()
     End Sub
@@ -238,13 +212,11 @@ Partial Class Form1
     Friend WithEvents PictureBox1 As PictureBox
     Friend WithEvents PictureBox2 As PictureBox
     Friend WithEvents Label1 As Label
-    Friend WithEvents PictureBox5 As PictureBox
     Friend WithEvents PictureBox4 As PictureBox
     Friend WithEvents PictureBox3 As PictureBox
     Friend WithEvents PictureBox10 As PictureBox
     Friend WithEvents PictureBox9 As PictureBox
     Friend WithEvents PictureBox8 As PictureBox
     Friend WithEvents PictureBox7 As PictureBox
-    Friend WithEvents PictureBox6 As PictureBox
 
 End Class

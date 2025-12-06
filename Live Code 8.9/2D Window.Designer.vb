@@ -30,8 +30,6 @@ Partial Class Form2
         PictureBox2 = New PictureBox()
         PictureBox3 = New PictureBox()
         PictureBox4 = New PictureBox()
-        PictureBox5 = New PictureBox()
-        PictureBox6 = New PictureBox()
         PictureBox7 = New PictureBox()
         PictureBox8 = New PictureBox()
         PictureBox9 = New PictureBox()
@@ -49,8 +47,6 @@ Partial Class Form2
         CType(PictureBox2, ComponentModel.ISupportInitialize).BeginInit()
         CType(PictureBox3, ComponentModel.ISupportInitialize).BeginInit()
         CType(PictureBox4, ComponentModel.ISupportInitialize).BeginInit()
-        CType(PictureBox5, ComponentModel.ISupportInitialize).BeginInit()
-        CType(PictureBox6, ComponentModel.ISupportInitialize).BeginInit()
         CType(PictureBox7, ComponentModel.ISupportInitialize).BeginInit()
         CType(PictureBox8, ComponentModel.ISupportInitialize).BeginInit()
         CType(PictureBox9, ComponentModel.ISupportInitialize).BeginInit()
@@ -117,24 +113,6 @@ Partial Class Form2
         PictureBox4.Size = New Size(5, 342)
         PictureBox4.TabIndex = 12
         PictureBox4.TabStop = False
-        ' 
-        ' PictureBox5
-        ' 
-        PictureBox5.BackColor = Color.Yellow
-        PictureBox5.Location = New Point(533, 110)
-        PictureBox5.Name = "PictureBox5"
-        PictureBox5.Size = New Size(5, 342)
-        PictureBox5.TabIndex = 13
-        PictureBox5.TabStop = False
-        ' 
-        ' PictureBox6
-        ' 
-        PictureBox6.BackColor = Color.Yellow
-        PictureBox6.Location = New Point(579, 110)
-        PictureBox6.Name = "PictureBox6"
-        PictureBox6.Size = New Size(5, 342)
-        PictureBox6.TabIndex = 14
-        PictureBox6.TabStop = False
         ' 
         ' PictureBox7
         ' 
@@ -269,14 +247,12 @@ Partial Class Form2
         Controls.Add(EndNode)
         Controls.Add(StartNode)
         Controls.Add(Btn_Exit)
-        Controls.Add(PictureBox5)
         Controls.Add(PictureBox4)
         Controls.Add(PictureBox3)
         Controls.Add(PictureBox10)
         Controls.Add(PictureBox9)
         Controls.Add(PictureBox8)
         Controls.Add(PictureBox7)
-        Controls.Add(PictureBox6)
         Controls.Add(Btn_Export)
         Controls.Add(Label1)
         Controls.Add(PictureBox1)
@@ -288,8 +264,6 @@ Partial Class Form2
         CType(PictureBox2, ComponentModel.ISupportInitialize).EndInit()
         CType(PictureBox3, ComponentModel.ISupportInitialize).EndInit()
         CType(PictureBox4, ComponentModel.ISupportInitialize).EndInit()
-        CType(PictureBox5, ComponentModel.ISupportInitialize).EndInit()
-        CType(PictureBox6, ComponentModel.ISupportInitialize).EndInit()
         CType(PictureBox7, ComponentModel.ISupportInitialize).EndInit()
         CType(PictureBox8, ComponentModel.ISupportInitialize).EndInit()
         CType(PictureBox9, ComponentModel.ISupportInitialize).EndInit()
@@ -305,8 +279,6 @@ Partial Class Form2
     Friend WithEvents PictureBox2 As PictureBox
     Friend WithEvents PictureBox3 As PictureBox
     Friend WithEvents PictureBox4 As PictureBox
-    Friend WithEvents PictureBox5 As PictureBox
-    Friend WithEvents PictureBox6 As PictureBox
     Friend WithEvents PictureBox7 As PictureBox
     Friend WithEvents PictureBox8 As PictureBox
     Friend WithEvents PictureBox9 As PictureBox

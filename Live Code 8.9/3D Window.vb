@@ -6,11 +6,11 @@ Imports Live_Code_8._9.Form1
 
 Module Globals3D
 
-    Public MapWidth As Integer = 50     'Must be an even number
-    Public MapDepth As Integer = 30    'Must be an even number
-    Public PointIncr As Integer = 5
-    Public StartX As Integer = ((MapWidth / 2) * PointIncr * -1)
-    Public StartZ As Integer = (MapDepth / 2) * PointIncr
+    Public MapWidth As Integer = 40    'Must be an even number
+    Public MapDepth As Integer = 40    'Must be an even number
+    Public ThreeDScaleFactor As Integer = 5
+    Public StartX As Integer = ((MapWidth / 2) * ThreeDScaleFactor * -1)
+    Public StartZ As Integer = (MapDepth / 2) * ThreeDScaleFactor
 
     Public OGPointArray(MapWidth, MapDepth) As Point3D
     Public XpArray(MapWidth, MapDepth) As Double
@@ -34,7 +34,7 @@ Public Class Form1
 
     Dim AngleY As Double = 0
     Dim AngleX As Double = 0
-    Const A As Double = PI / 4
+    Const A As Double = PI / 6
     'Must be an odd number
 
     Dim GridPen As New Pen(Color.IndianRed, 0.5)
@@ -55,6 +55,8 @@ Public Class Form1
     Dim CompassAngle As Double
     Dim compassBool As Boolean
     Dim TotalAngle As Double
+
+
 
     Structure Point3D
         Public X As Double
@@ -91,10 +93,10 @@ Public Class Form1
         PictureBox3.Size = New Size(5, Me.Height + 42)
         PictureBox4.Location = New Point(300, 0)
         PictureBox4.Size = New Size(5, Me.Height + 42)
-        PictureBox5.Location = New Point(800, (Me.Height + 42) - 240)
-        PictureBox5.Size = New Size(5, 240)
-        PictureBox6.Location = New Point(1400, (Me.Height + 42) - 240)
-        PictureBox6.Size = New Size(5, 240)
+        'PictureBox5.Location = New Point(800, (Me.Height + 42) - 240)
+        'PictureBox5.Size = New Size(5, 240)
+        'PictureBox6.Location = New Point(1400, (Me.Height + 42) - 240)
+        'PictureBox6.Size = New Size(5, 240)
         PictureBox7.Location = New Point(Me.Width - 23, 0)
         PictureBox7.Size = New Size(5, Me.Height + 42)
         PictureBox8.Location = New Point(0, 0)
@@ -254,13 +256,13 @@ Public Class Form1
     Sub PerspectiveProjection()
         For j = 0 To MapDepth
             For i = 0 To MapWidth
-                XpArray(i, j) = (OGPointArray(i, j).X / ((OGPointArray(i, j).Z + 200) * Tan(A / 2))) * 200
+                XpArray(i, j) = (OGPointArray(i, j).X / ((OGPointArray(i, j).Z + 300) * Tan(A / 2))) * 200
             Next
         Next
 
         For j = 0 To MapDepth
             For i = 0 To MapWidth
-                YpArray(i, j) = (OGPointArray(i, j).Y / ((OGPointArray(i, j).Z + 200) * Tan(A / 2))) * 200
+                YpArray(i, j) = ((OGPointArray(i, j).Y) / ((OGPointArray(i, j).Z + 300) * Tan(A / 2))) * 200
             Next
         Next
     End Sub
@@ -520,7 +522,7 @@ Public Class Form1
     Sub Reset()
         For j = 0 To MapDepth
             For i = 0 To MapWidth
-                OGPointArray(i, j) = New Point3D((StartX) + (i * PointIncr), YValue(i, j), StartZ - (j * PointIncr))
+                OGPointArray(i, j) = New Point3D((StartX) + (i * ThreeDScaleFactor), YValue(i, j), StartZ - (j * ThreeDScaleFactor))
             Next
         Next
         PPand2DArray()

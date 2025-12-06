@@ -2,6 +2,7 @@
 Imports System.Drawing.Drawing2D
 Imports System.IO
 Imports Live_Code_8._9.Form1
+Imports System.Threading
 
 Module Globals2D
     Public PathPointArray(10000) As Point
@@ -60,10 +61,10 @@ Public Class Form2
         PictureBox3.Size = New Size(5, Me.Height + 42)
         PictureBox4.Location = New Point(300, 0)
         PictureBox4.Size = New Size(5, Me.Height + 42)
-        PictureBox5.Location = New Point(800, (Me.Height + 42) - 240)
-        PictureBox5.Size = New Size(5, 240)
-        PictureBox6.Location = New Point(1400, (Me.Height + 42) - 240)
-        PictureBox6.Size = New Size(5, 240)
+        'PictureBox5.Location = New Point(800, (Me.Height + 42) - 240)
+        'PictureBox5.Size = New Size(5, 240)
+        'PictureBox6.Location = New Point(1400, (Me.Height + 42) - 240)
+        'PictureBox6.Size = New Size(5, 240)
         PictureBox7.Location = New Point(Me.Width - 23, 0)
         PictureBox7.Size = New Size(5, Me.Height + 42)
         PictureBox8.Location = New Point(0, 0)
@@ -111,8 +112,8 @@ Public Class Form2
 
 
 
-        StartX = ((MapWidth / 2) * PointIncr * -1)
-        StartZ = (MapDepth / 2) * PointIncr
+        StartX = ((MapWidth / 2) * ThreeDScaleFactor * -1)
+        StartZ = (MapDepth / 2) * ThreeDScaleFactor
 
 
         XChunkAmount = MapWidth / ChunkSize
@@ -122,7 +123,6 @@ Public Class Form2
 
 
         '////////////////////////////// ReSize Form 2 Variables \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
-        ReDim PointArray2D(MapWidth, MapDepth)
         TempSFWidth = MapWidthBound \ MapWidth
         TempSFDepth = MapDepthBound \ MapDepth
 
@@ -141,7 +141,7 @@ Public Class Form2
 
         For j = 0 To MapDepth
             For i = 0 To MapWidth
-                PointArray2D(i, j) = New Point((StartX) + (i * PointIncr), (StartZ * -1) + (j * PointIncr))
+                PointArray2D(i, j) = New Point((StartX) + (i * ThreeDScaleFactor), (StartZ * -1) + (j * ThreeDScaleFactor))
             Next
         Next
 
@@ -160,7 +160,7 @@ Public Class Form2
         For j = 0 To MapDepth
             For i = 0 To MapWidth
                 YValue(i, j) = (FinalElevationArray(i, j) * 30) + 135
-                OGPointArray(i, j) = New Point3D((StartX) + (i * PointIncr), YValue(i, j), StartZ - (j * PointIncr))
+                OGPointArray(i, j) = New Point3D((StartX) + (i * ThreeDScaleFactor), YValue(i, j), StartZ - (j * ThreeDScaleFactor))
             Next
         Next
 
@@ -272,21 +272,19 @@ Public Class Form2
             PathPointArray(i) -= New Point(StartMapX + ((MapWidth * TwoDScaleFactor) / 2), StartMapY + ((MapDepth * TwoDScaleFactor) / 2))
             PathPointArray(i).Y /= TwoDScaleFactor
             PathPointArray(i).X /= TwoDScaleFactor
-            PathPointArray(i).Y *= PointIncr
-            PathPointArray(i).X *= PointIncr
+            PathPointArray(i).Y *= ThreeDScaleFactor
+            PathPointArray(i).X *= ThreeDScaleFactor
             PathPointArray(i).Y = -PathPointArray(i).Y
         Next
 
         For k = 0 To PathLength - 1
             For j = 0 To MapDepth
                 For i = 0 To MapWidth
-                    If PathPointArray(k).X >= OGPointArray(i, j).X - 2 And PathPointArray(k).X <= OGPointArray(i, j).X + 2 And PathPointArray(k).Y >= OGPointArray(i, j).Z - 2 And PathPointArray(k).Y <= OGPointArray(i, j).Z + 2 Then
+                    If PathPointArray(k).X >= OGPointArray(i, j).X - 1 And PathPointArray(k).X <= OGPointArray(i, j).X + 1 And PathPointArray(k).Y >= OGPointArray(i, j).Z - 1 And PathPointArray(k).Y <= OGPointArray(i, j).Z + 1 Then
                         PathMark.Add(New Point(i, j))
                     End If
-
                 Next
             Next
-
         Next
 
         Me.Invalidate()
@@ -336,6 +334,7 @@ Public Class Form2
 
             If ClickedButton.Location = New Point(250, 600) Then
                 CreateNode()
+                NodeList(NodeList.Count - 1).Enabled = False
             End If
 
             If ClickedButton.Name = "StartNode" Then
@@ -347,6 +346,7 @@ Public Class Form2
             GeneralNodeSwitch = True
         Else
             Timer1.Stop()
+            NodeList(NodeList.Count - 1).Enabled = True
             If ClickedButton.Location.X >= StartMapX And ClickedButton.Location.X <= (StartMapX + (MapWidth * TwoDScaleFactor)) And ClickedButton.Location.Y >= StartMapY And ClickedButton.Location.Y <= (StartMapY + (MapDepth * TwoDScaleFactor)) Then
                 For j = 0 To MapDepth
                     For i = 0 To MapWidth
@@ -464,26 +464,83 @@ Public Class Form2
     End Sub
 
     Private Sub Btn_WidthDown_Click(sender As Object, e As EventArgs) Handles Btn_WidthDown.Click
+        If MapWidth = 100 Then
+            Btn_WidthUp.Enabled = True
+        End If
         MapWidth -= 10
+        ThreeDScaleFactor = ThreeDScaleFactorDeterminant()
         Formalities2d()
         ClearNodes()
+
+        If MapWidth = 10 Then
+            Btn_WidthDown.Enabled = False
+        End If
     End Sub
 
     Private Sub Btn_WidthUp_Click(sender As Object, e As EventArgs) Handles Btn_WidthUp.Click
+        If MapWidth = 10 Then
+            Btn_WidthDown.Enabled = True
+        End If
         MapWidth += 10
+        ThreeDScaleFactor = ThreeDScaleFactorDeterminant()
         Formalities2d()
         ClearNodes()
+
+        If MapWidth = 100 Then
+            Btn_WidthUp.Enabled = False
+        End If
+
     End Sub
 
     Private Sub Btn_DepthDown_Click(sender As Object, e As EventArgs) Handles Btn_DepthDown.Click
+        If MapDepth = 100 Then
+            Btn_DepthUp.Enabled = True
+        End If
         MapDepth -= 10
+        ThreeDScaleFactor = ThreeDScaleFactorDeterminant()
         Formalities2d()
         ClearNodes()
+        If MapDepth = 10 Then
+            Btn_DepthDown.Enabled = False
+        End If
     End Sub
 
     Private Sub Btn_DepthUp_Click(sender As Object, e As EventArgs) Handles Btn_DepthUp.Click
+        If MapDepth = 10 Then
+            Btn_DepthDown.Enabled = True
+        End If
+
         MapDepth += 10
+        ThreeDScaleFactor = ThreeDScaleFactorDeterminant()
+
         Formalities2d()
         ClearNodes()
+        If MapDepth = 100 Then
+            Btn_DepthUp.Enabled = False
+        End If
     End Sub
+
+    Function ThreeDScaleFactorDeterminant()
+        Dim TempLargest As Integer
+        If MapWidth > MapDepth Then
+            TempLargest = MapWidth
+        Else
+            TempLargest = MapDepth
+        End If
+
+        Select Case TempLargest
+            Case 10
+                Return 20
+            Case 20
+                Return 10
+            Case 30, 40, 50
+                Return 5
+            Case 60
+                Return 4
+            Case 70, 80
+                Return 3
+            Case 90, 100
+                Return 2
+        End Select
+    End Function
 End Class
