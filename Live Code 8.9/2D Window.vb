@@ -107,8 +107,6 @@ Public Class Form2
         ReDim NewPointArray(MapWidth, MapDepth)
         ReDim YValue(MapWidth, MapDepth)
         ReDim FinalElevationArray(MapWidth, MapDepth)
-        ReDim TopTriangles(MapWidth, MapDepth)
-        ReDim BottemTriangles(MapWidth, MapDepth)
 
 
 
@@ -159,7 +157,7 @@ Public Class Form2
 
         For j = 0 To MapDepth
             For i = 0 To MapWidth
-                YValue(i, j) = (FinalElevationArray(i, j) * 30) + 135
+                YValue(i, j) = (FinalElevationArray(i, j) * Extremity) + 125
                 OGPointArray(i, j) = New Point3D((StartX) + (i * ThreeDScaleFactor), YValue(i, j), StartZ - (j * ThreeDScaleFactor))
             Next
         Next
@@ -175,21 +173,24 @@ Public Class Form2
 
         For j = 0 To MapDepth
             For i = 0 To MapWidth - 1
-                Pen2D.Color = Form1.ColorGradient(i, j)
+                YValForColour = OGPointArray(i, j).Y
+                Pen2D.Color = Form1.ColorGradient(YValForColour)
                 e.Graphics.DrawLine(Pen2D, TranslatedPointArray2D(i, j), TranslatedPointArray2D(i + 1, j))
             Next
         Next
 
         For i = 0 To MapWidth
             For j = 0 To MapDepth - 1
-                Pen2D.Color = Form1.ColorGradient(i, j)
+                YValForColour = OGPointArray(i, j).Y
+                Pen2D.Color = Form1.ColorGradient(YValForColour)
                 e.Graphics.DrawLine(Pen2D, TranslatedPointArray2D(i, j), TranslatedPointArray2D(i, j + 1))
             Next
         Next
 
         For j = 0 To MapDepth - 1
             For i = 0 To MapWidth - 1
-                Pen2D.Color = Form1.ColorGradient(i, j)
+                YValForColour = OGPointArray(i, j).Y
+                Pen2D.Color = Form1.ColorGradient(YValForColour)
                 e.Graphics.DrawLine(Pen2D, TranslatedPointArray2D(i + 1, j), TranslatedPointArray2D(i, j + 1))
             Next
         Next

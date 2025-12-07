@@ -24,18 +24,23 @@ Module Globals3D
 
     Public FinalElevationArray(MapWidth, MapDepth) As Double
 
-    Public TopTriangles(MapWidth, MapDepth)() As Point
-    Public BottemTriangles(MapWidth, MapDepth)() As Point
+    Public TopTriangleItemList As New List(Of Triangle3D)
+    Public BottemTriangleItemList As New List(Of Triangle3D)
 
+    Public SortedTopTriangleItemList As New List(Of Triangle3D)
+    Public SortedBottemTriangleItemList As New List(Of Triangle3D)
 
+    Public Extremity As Integer = 50
+
+    Public YValForColour As Double
 End Module
 Public Class Form1
     Dim rnd As New Random()
 
     Dim AngleY As Double = 0
     Dim AngleX As Double = 0
-    Const A As Double = PI / 6
-    'Must be an odd number
+    Dim A As Double = PI / 4
+
 
     Dim GridPen As New Pen(Color.IndianRed, 0.5)
     Dim MiddleBlue As Color = Color.FromArgb(86, 108, 242)
@@ -56,7 +61,13 @@ Public Class Form1
     Dim compassBool As Boolean
     Dim TotalAngle As Double
 
-
+    Public Structure Triangle3D
+        Public P1 As Point
+        Public P2 As Point
+        Public P3 As Point
+        Public Depth As Double
+        Public Elevation As Double
+    End Structure
 
     Structure Point3D
         Public X As Double
@@ -119,6 +130,8 @@ Public Class Form1
 
     Sub PPand2DArray()
         PerspectiveProjection()
+        TopTriangleItemList.Clear()
+        BottemTriangleItemList.Clear()
 
         For j = 0 To MapDepth
             For i = 0 To MapWidth
@@ -128,46 +141,129 @@ Public Class Form1
 
         For j = 0 To MapDepth - 1
             For i = 0 To MapWidth - 1
-                TopTriangles(i, j) = {
-                    NewPointArray(i, j),
-                    NewPointArray(i + 1, j),
-                    NewPointArray(i, j + 1)
-                }
+                Dim TopTriangle As New Triangle3D()
+                TopTriangle.P1 = NewPointArray(i, j)
+                TopTriangle.P2 = NewPointArray(i + 1, j)
+                TopTriangle.P3 = NewPointArray(i, j + 1)
 
-                BottemTriangles(i, j) = {
-                    NewPointArray(i + 1, j + 1),
-                    NewPointArray(i + 1, j),
-                    NewPointArray(i, j + 1)
-                }
+                TopTriangle.Depth = (
+                    OGPointArray(i, j).Z +
+                    OGPointArray(i + 1, j).Z +
+                    OGPointArray(i, j + 1).Z
+                ) / 3
+
+                TopTriangle.Elevation = (
+                    OGPointArray(i, j).Y +
+                    OGPointArray(i + 1, j).Y +
+                    OGPointArray(i, j + 1).Y
+                ) / 3
+
+                TopTriangleItemList.Add(TopTriangle)
+
+
+                Dim BottemTriangle As New Triangle3D()
+                BottemTriangle.P1 = NewPointArray(i + 1, j)
+                BottemTriangle.P2 = NewPointArray(i, j + 1)
+                BottemTriangle.P3 = NewPointArray(i + 1, j + 1)
+
+                BottemTriangle.Depth = (
+                    OGPointArray(i + 1, j).Z +
+                    OGPointArray(i, j + 1).Z +
+                    OGPointArray(i + 1, j).Z
+                ) / 3
+
+                BottemTriangle.Elevation = (
+                    OGPointArray(i + 1, j).Y +
+                    OGPointArray(i, j + 1).Y +
+                    OGPointArray(i + 1, j + 1).Y
+                ) / 3
+
+                BottemTriangleItemList.Add(BottemTriangle)
             Next
         Next
-
     End Sub
+
+    Function MergeSortTriangles(ByVal TempList As List(Of Triangle3D)) As List(Of Triangle3D)
+        Dim ListOfItems As New List(Of List(Of Triangle3D))
+        Dim Item As List(Of Triangle3D)
+        Dim Index As Integer
+        Dim NewList As List(Of Triangle3D)
+
+        For x = 0 To TempList.Count - 1
+            Item = New List(Of Triangle3D)()
+            Item.Add(TempList(x))
+            ListOfItems.Add(Item)
+        Next
+
+        While ListOfItems.Count <> 1
+            Index = 0
+            While Index < ListOfItems.Count - 1
+                NewList = MergeSort(ListOfItems(Index), ListOfItems(Index + 1))
+                ListOfItems(Index) = NewList
+                ListOfItems.RemoveAt(Index + 1)
+                Index += 1
+            End While
+        End While
+
+        Return ListOfItems(0)
+
+    End Function
+
+    Function MergeSort(ByVal List1 As List(Of Triangle3D), ByVal List2 As List(Of Triangle3D)) As List(Of Triangle3D)
+        Dim NewList As New List(Of Triangle3D)
+        Dim Index1 As Integer = 0
+        Dim Index2 As Integer = 0
+
+        While Index1 < List1.Count And Index2 < List2.Count
+            If List1(Index1).Depth > List2(Index2).Depth Then
+                NewList.Add(List2(Index2))
+                Index2 += 1
+            ElseIf List1(Index1).Depth < List2(Index2).Depth Then
+                NewList.Add(List1(Index1))
+                Index1 += 1
+            ElseIf List1(Index1).Depth = List2(Index2).Depth Then
+                NewList.Add(List1(Index1))
+                NewList.Add(List2(Index2))
+                Index1 += 1
+                Index2 += 1
+            End If
+        End While
+
+        If Index1 < List1.Count Then
+            For item = Index1 To List1.Count - 1
+                NewList.Add(List1(item))
+            Next
+        ElseIf Index2 < List2.Count Then
+            For item = Index2 To List2.Count - 1
+                NewList.Add(List2(item))
+            Next
+        End If
+        Return NewList
+    End Function
 
     Private Sub Form1_Paint(sender As Object, e As PaintEventArgs) Handles MyBase.Paint
         e.Graphics.Clear(Color.Black)
         Dim CustomBrush As New SolidBrush(LighterIndianRed)
         e.Graphics.SmoothingMode = SmoothingMode.AntiAlias
 
-        '///////////////// Draws lines \\\\\\\\\\\\\\\\\\\\
-
-        For j = 0 To MapDepth - 1
-            For i = 0 To MapWidth - 1
-                If TopTriangles(i, j) IsNot Nothing Then
-                    CustomBrush.Color = ColorGradient(i, j)
-                    e.Graphics.FillPolygon(CustomBrush, TopTriangles(i, j))
-                End If
-            Next
-        Next
 
 
-        For j = 0 To MapDepth - 1
-            For i = 0 To MapWidth - 1
-                If BottemTriangles(i, j) IsNot Nothing Then
-                    CustomBrush.Color = OffColorGradient(i, j)
-                    e.Graphics.FillPolygon(CustomBrush, BottemTriangles(i, j))
-                End If
-            Next
+        SortedTopTriangleItemList = MergeSortTriangles(TopTriangleItemList)
+        SortedBottemTriangleItemList = MergeSortTriangles(BottemTriangleItemList)
+
+        For i = 0 To SortedTopTriangleItemList.Count - 1
+            If SortedTopTriangleItemList IsNot Nothing Then
+                Dim TopPoints() As Point = {SortedTopTriangleItemList(i).P1, SortedTopTriangleItemList(i).P2, SortedTopTriangleItemList(i).P3}
+                YValForColour = SortedTopTriangleItemList(i).Elevation
+                CustomBrush.Color = ColorGradient(YValForColour)
+                e.Graphics.FillPolygon(CustomBrush, TopPoints)
+            End If
+            If SortedBottemTriangleItemList IsNot Nothing Then
+                Dim BottemPoints() As Point = {SortedBottemTriangleItemList(i).P1, SortedBottemTriangleItemList(i).P2, SortedBottemTriangleItemList(i).P3}
+                YValForColour = SortedBottemTriangleItemList(i).Elevation
+                CustomBrush.Color = OffColorGradient(YValForColour)
+                e.Graphics.FillPolygon(CustomBrush, BottemPoints)
+            End If
         Next
 
 
@@ -229,24 +325,24 @@ Public Class Form1
         g.DrawImage(compass, 0, 0)
     End Sub
 
-    Public Function ColorGradient(ByVal i As Integer, ByVal j As Integer) As Color
-        If OGPointArray(i, j).Y < 145 Then
+    Public Function ColorGradient(ByVal YValForColour) As Color
+        If YValForColour < 145 Then
             Return Color.LightBlue
-        ElseIf OGPointArray(i, j).Y >= 145 And OGPointArray(i, j).Y < 150 Then
+        ElseIf YValForColour >= 145 And YValForColour < 150 Then
             Return BetweenMiddleAndLightBlue
-        ElseIf OGPointArray(i, j).Y >= 150 And OGPointArray(i, j).Y < 157 Then
+        ElseIf YValForColour >= 150 And YValForColour < 157 Then
             Return MiddleBlue
         Else
             Return Color.Blue
         End If
     End Function
 
-    Public Function OffColorGradient(ByVal i As Integer, ByVal j As Integer) As Color
-        If OGPointArray(i, j).Y < 145 Then
+    Public Function OffColorGradient(ByVal YValForColour) As Color
+        If YValForColour < 145 Then
             Return Color.FromArgb(150, 200, 220)
-        ElseIf OGPointArray(i, j).Y >= 145 And OGPointArray(i, j).Y < 150 Then
+        ElseIf YValForColour >= 145 And YValForColour < 150 Then
             Return Color.FromArgb(115, 145, 220)
-        ElseIf OGPointArray(i, j).Y >= 150 And OGPointArray(i, j).Y < 157 Then
+        ElseIf YValForColour >= 150 And YValForColour < 157 Then
             Return Color.FromArgb(70, 95, 230)
         Else
             Return Color.FromArgb(0, 0, 220)
@@ -256,13 +352,13 @@ Public Class Form1
     Sub PerspectiveProjection()
         For j = 0 To MapDepth
             For i = 0 To MapWidth
-                XpArray(i, j) = (OGPointArray(i, j).X / ((OGPointArray(i, j).Z + 300) * Tan(A / 2))) * 200
+                XpArray(i, j) = (OGPointArray(i, j).X / ((OGPointArray(i, j).Z + 200) * Tan(A / 2))) * 200
             Next
         Next
 
         For j = 0 To MapDepth
             For i = 0 To MapWidth
-                YpArray(i, j) = ((OGPointArray(i, j).Y) / ((OGPointArray(i, j).Z + 300) * Tan(A / 2))) * 200
+                YpArray(i, j) = ((OGPointArray(i, j).Y) / ((OGPointArray(i, j).Z + 200) * Tan(A / 2))) * 200
             Next
         Next
     End Sub
@@ -416,20 +512,6 @@ Public Class Form1
         PPand2DArray()
     End Sub
 
-    Sub RotateX()
-        For j = 0 To MapDepth
-            For i = 0 To MapWidth
-                Dim TempX As Double = OGPointArray(i, j).X
-                Dim TempY As Double = OGPointArray(i, j).Y
-                Dim TempZ As Double = OGPointArray(i, j).Z
-                OGPointArray(i, j).Y = (TempY * Cos(AngleX)) - (TempZ * Sin(AngleX))
-                OGPointArray(i, j).Z = (TempY * Sin(AngleX)) + (TempZ * Cos(AngleX))
-            Next
-        Next
-
-        PPand2DArray()
-    End Sub
-
     Private Sub Form1_MouseDown(sender As Object, e As MouseEventArgs) Handles Me.MouseDown
         OGMouseLocation = e.Location
         Select Case e.Button
@@ -451,10 +533,6 @@ Public Class Form1
                 AngleY = MouseXMovement * 0.002
                 TotalAngle += AngleY
                 RotateY()
-
-            ElseIf RightClickDetect = True Then
-                AngleX = MouseYMovement * 0.002
-                RotateX()
             End If
 
             OGMouseLocation = e.Location
@@ -468,12 +546,6 @@ Public Class Form1
         MouseDragging = False
     End Sub
 
-    Private Sub Form1_MouseWheel(sender As Object, e As MouseEventArgs) Handles Me.MouseWheel
-        MouseZoom += e.Delta / 1200
-
-        PPand2DArray()
-        Me.Invalidate()
-    End Sub
 
     Private Sub Btn_Reset_Click(sender As Object, e As EventArgs) Handles Btn_Reset.Click
         Reset()
@@ -483,7 +555,7 @@ Public Class Form1
         PerlinNoise()
         For j = 0 To MapDepth
             For i = 0 To MapWidth
-                YValue(i, j) = (FinalElevationArray(i, j) * 30) + 135
+                YValue(i, j) = (FinalElevationArray(i, j) * Extremity) + 125
                 OGPointArray(i, j).Y = YValue(i, j)
             Next
         Next
