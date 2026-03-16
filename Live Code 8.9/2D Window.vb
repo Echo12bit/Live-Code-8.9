@@ -8,7 +8,41 @@ Module Globals2D
     Public PathPointArray(10000) As Point
     Public PathLength As Integer
     Public PathMark As New List(Of Point)
+    Public ElevationProfileHeights As New List(Of Double)
+    Public MaxElevation As Double
+    Public MinElevation As Double
+    Public ElevationCoordiates As New List(Of Point)
 
+    Public RouteColour As Color = Color.Yellow
+    Public RouteWidth As Double = 4
+    Public RoutePen As New Pen(RouteColour, RouteWidth)
+
+    Public GridColour As Color = Color.Wheat
+    Public GridWidth As Double = 0.5
+    Public GridPen As New Pen(GridColour, GridWidth)
+
+    Public StartNodeColour As Color = Color.Lime
+    Public EndNodeColour As Color = Color.Red
+    Public IntermediateNodeColour As Color = Color.Yellow
+
+    Public RouteDistance As Double
+    Public RouteMaxHeight As Integer
+    Public RouteMinHeight As Integer
+    Public RouteTotalHeight As Integer
+    Public RouteTime As Double
+
+    Public RouteStatsBool As Boolean
+
+    Public HeightScale As Double
+    Public WidthScale As Double
+
+    Public ImperialBool As Boolean
+    Public MilesMultiplier As Double = 1
+    Public FeetMultiplier As Double = 1
+    Public kmstring As String = "km"
+    Public mstring As String = "m"
+
+    Public WalkingSpeed As Integer = 4
 End Module
 
 Public Class Form2
@@ -44,6 +78,14 @@ Public Class Form2
     Dim TranslatedStartX As Integer
     Dim TranslatedStartY As Integer
 
+    Dim StartNodeLocation As New Point(35, 480)
+    Dim EndNodeLocation As New Point(100, 480)
+    Dim IntermidateNodeLocation As New Point(35, 415)
+
+    Dim GenerateBool As Boolean = True
+
+
+
     Private Sub Form2_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.BackColor = Color.White
         Me.FormBorderStyle = FormBorderStyle.None
@@ -51,20 +93,12 @@ Public Class Form2
 
         '////////////////////////////// UI FEATURES \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
-        Me.Cursor = Cursors.Cross
+        Me.Cursor = Cursors.Cross  'changes cursor to be a cross
 
-        PictureBox1.Location = New Point(0, 0)
-        PictureBox1.Size = New Size(300, Me.Height + 42)
-        PictureBox2.Location = New Point(300, (Me.Height + 42) - 240)
-        PictureBox2.Size = New Size(Me.Width, 240)
         PictureBox3.Location = New Point(0, 0)
         PictureBox3.Size = New Size(5, Me.Height + 42)
         PictureBox4.Location = New Point(300, 0)
         PictureBox4.Size = New Size(5, Me.Height + 42)
-        'PictureBox5.Location = New Point(800, (Me.Height + 42) - 240)
-        'PictureBox5.Size = New Size(5, 240)
-        'PictureBox6.Location = New Point(1400, (Me.Height + 42) - 240)
-        'PictureBox6.Size = New Size(5, 240)
         PictureBox7.Location = New Point(Me.Width - 23, 0)
         PictureBox7.Size = New Size(5, Me.Height + 42)
         PictureBox8.Location = New Point(0, 0)
@@ -73,8 +107,12 @@ Public Class Form2
         PictureBox9.Size = New Size(Me.Width, 5)
         PictureBox10.Location = New Point(0, Me.Height + 37)
         PictureBox10.Size = New Size(Me.Width, 5)
+        'Initialises pictureboxes that build the background UI
 
-        CreateNode()
+        Lbl_MapSize.Text = "Map Size: " + MapWidth.ToString + "x" + MapDepth.ToString
+        'writes the initial map dimentions to the label
+        CreateNode() 'calls subroutine that creates an intermediate node
+
 
 
         Dim Path As New GraphicsPath()
@@ -82,10 +120,10 @@ Public Class Form2
         StartNode.Region = New Region(Path)
         Dim Path2 As New GraphicsPath()
         Path2.AddEllipse(0, 0, 20, 20)
-        EndNode.Region = New Region(Path)
+        EndNode.Region = New Region(Path2)
 
-        StartNode.Location = New Point(500, 900)
-        EndNode.Location = New Point(500, 950)
+        StartNode.Location = StartNodeLocation
+        EndNode.Location = EndNodeLocation
 
         '\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\----////////////////////////////////////////
 
@@ -93,6 +131,8 @@ Public Class Form2
         AddHandler EndNode.Click, AddressOf Node_Click
 
         Formalities2d()
+
+        WriteRouteStats()
 
     End Sub
 
@@ -150,53 +190,79 @@ Public Class Form2
             Next
         Next
         '\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\----------------////////////////////////////////////////
-
-
-
-        Form1.PerlinNoise()
-
-        For j = 0 To MapDepth
-            For i = 0 To MapWidth
-                YValue(i, j) = (FinalElevationArray(i, j) * Extremity) + 125
-                OGPointArray(i, j) = New Point3D((StartX) + (i * ThreeDScaleFactor), YValue(i, j), StartZ - (j * ThreeDScaleFactor))
-            Next
-        Next
-
+        Form1.KeyFunctions()
         Me.Invalidate()
     End Sub
 
     Private Sub Form2_Paint(sender As Object, e As PaintEventArgs) Handles MyBase.Paint
         e.Graphics.Clear(Color.Black)
-        Dim Pen2D As New Pen(Color.Brown, 0.5)
-        Dim PathPen As New Pen(Color.Yellow, 4)
         e.Graphics.SmoothingMode = SmoothingMode.AntiAlias
 
         For j = 0 To MapDepth
             For i = 0 To MapWidth - 1
-                YValForColour = OGPointArray(i, j).Y
-                Pen2D.Color = Form1.ColorGradient(YValForColour)
-                e.Graphics.DrawLine(Pen2D, TranslatedPointArray2D(i, j), TranslatedPointArray2D(i + 1, j))
+                YValForColour = YValue(i, j)
+                GridPen.Color = Form1.ColorGradient(YValForColour)
+                e.Graphics.DrawLine(GridPen, TranslatedPointArray2D(i, j), TranslatedPointArray2D(i + 1, j))
             Next
         Next
 
         For i = 0 To MapWidth
             For j = 0 To MapDepth - 1
-                YValForColour = OGPointArray(i, j).Y
-                Pen2D.Color = Form1.ColorGradient(YValForColour)
-                e.Graphics.DrawLine(Pen2D, TranslatedPointArray2D(i, j), TranslatedPointArray2D(i, j + 1))
+                YValForColour = YValue(i, j)
+                GridPen.Color = Form1.ColorGradient(YValForColour)
+                e.Graphics.DrawLine(GridPen, TranslatedPointArray2D(i, j), TranslatedPointArray2D(i, j + 1))
             Next
         Next
 
         For j = 0 To MapDepth - 1
             For i = 0 To MapWidth - 1
-                YValForColour = OGPointArray(i, j).Y
-                Pen2D.Color = Form1.ColorGradient(YValForColour)
-                e.Graphics.DrawLine(Pen2D, TranslatedPointArray2D(i + 1, j), TranslatedPointArray2D(i, j + 1))
+                YValForColour = YValue(i, j)
+                GridPen.Color = Form1.ColorGradient(YValForColour)
+                e.Graphics.DrawLine(GridPen, TranslatedPointArray2D(i + 1, j), TranslatedPointArray2D(i, j + 1))
             Next
         Next
-
+        RoutePen.Color = RouteColour
+        RoutePen.Width = RouteWidth
         For i = 0 To PathLength - 2
-            e.Graphics.DrawLine(PathPen, TranslatedPathPointList(i), TranslatedPathPointList(i + 1))
+            e.Graphics.DrawLine(RoutePen, TranslatedPathPointList(i), TranslatedPathPointList(i + 1))
+        Next
+
+        Dim RectBrush As New SolidBrush(Color.FromArgb(0, 70, 120))
+        Dim PicBox2 As New Rectangle(300, (Me.Height) - 240, Me.Width, 240)
+        Dim PicBox1 As New Rectangle(0, 0, 300, Me.Height + 42)
+        e.Graphics.FillRectangle(RectBrush, PicBox2)
+        e.Graphics.FillRectangle(RectBrush, PicBox1)
+
+        Dim TempPen As New Pen(Color.White, 4)
+        e.Graphics.DrawLine(TempPen, New Point(400, 1020), New Point(400, 870))
+        e.Graphics.DrawLine(TempPen, New Point(400, 1020), New Point(1400, 1020))
+
+
+        TempPen.Width = 1
+        For x = 0 To PathMark.Count - 2
+            e.Graphics.DrawLine(TempPen, ElevationCoordiates(x), ElevationCoordiates(x + 1))
+        Next
+
+        Dim UIPen As New Pen(Color.White, 2)
+        e.Graphics.DrawLine(UIPen, New Point(10, 90), New Point(65, 90))
+        e.Graphics.DrawLine(UIPen, New Point(170, 90), New Point(290, 90))
+        e.Graphics.DrawLine(UIPen, New Point(10, 370), New Point(68, 370))
+        e.Graphics.DrawLine(UIPen, New Point(170, 370), New Point(290, 370))
+        e.Graphics.DrawLine(UIPen, New Point(10, 770), New Point(68, 770))
+        e.Graphics.DrawLine(UIPen, New Point(170, 770), New Point(290, 770))
+
+
+        Dim ArrowBrush As New SolidBrush(Color.White)
+        Dim ArrowPoints1() As Point = {New Point(392, 870), New Point(408, 870), New Point(400, 855)}
+        e.Graphics.FillPolygon(ArrowBrush, ArrowPoints1)
+        Dim ArrowPoints2() As Point = {New Point(1400, 1012), New Point(1400, 1028), New Point(1415, 1020)}
+        e.Graphics.FillPolygon(ArrowBrush, ArrowPoints2)
+
+        StartNode.BackColor = StartNodeColour
+        EndNode.BackColor = EndNodeColour
+
+        For i = 0 To NodeList.Count - 1
+            NodeList(i).BackColor = IntermediateNodeColour
         Next
     End Sub
 
@@ -291,6 +357,29 @@ Public Class Form2
         Me.Invalidate()
     End Sub
 
+    Sub ElevationProfile()
+
+        ClearProfile()
+        For j = 0 To MapDepth
+            For i = 0 To MapWidth
+                If YValue(i, j) > MaxElevation Then MaxElevation = YValue(i, j)
+                If YValue(i, j) < MinElevation Then MinElevation = YValue(i, j)
+            Next
+        Next
+
+        HeightScale = 150 / MaxElevation
+        WidthScale = 1000 / PathLength
+
+        For x = 0 To PathMark.Count - 1
+            ElevationProfileHeights.Add((YValue((PathMark(x).X), (PathMark(x).Y))) * HeightScale)
+        Next
+
+
+        For x = 0 To PathMark.Count - 1
+            ElevationCoordiates.Add(New Point(((x * WidthScale) + 400), (870 + ElevationProfileHeights(x))))
+        Next
+    End Sub
+
     Private Sub Btn_Export_Click(sender As Object, e As EventArgs) Handles Btn_Export.Click
         Form1.Show()
         Me.Hide()
@@ -306,15 +395,82 @@ Public Class Form2
     End Sub
 
     Private Sub Btn_Generate_Click(sender As Object, e As EventArgs) Handles Btn_Generate.Click
-
-        If StartNodeInPos = True And EndNodeInPos = True Then
-            NodesOnGridList.Remove(EndNode.Location)
-            TravelingSalesman()
-            NodesOnGridList.Add(EndNode.Location)
-            PathFinding()
+        If GenerateBool Then
+            If StartNodeInPos = True And EndNodeInPos = True Then
+                NodesOnGridList.Remove(EndNode.Location)
+                TravelingSalesman()
+                NodesOnGridList.Add(EndNode.Location)
+                PathFinding()
+                ElevationProfile()
+                RouteStats()
+            End If
+            GenerateBool = False
         End If
+
     End Sub
 
+    Sub RouteStats()
+        If ImperialBool = True Then
+            MilesMultiplier = 0.6
+            FeetMultiplier = 3.3
+        Else
+            MilesMultiplier = 1
+            FeetMultiplier = 1
+        End If
+        RouteDistance = Round((PathMark.Count * 0.1) * MilesMultiplier, 3)
+        Dim TempTotalElevation As Double
+        Dim TempMaxElevation As Double = 0
+        Dim TempMinElevation As Double = 99
+        Dim TempList As New List(Of Double)
+        For i = 0 To PathMark.Count - 1
+            TempList.Add((ElevationProfileHeights(i) / HeightScale) * 1000)
+        Next
+        For i = 0 To PathMark.Count - 2
+            If TempList(i) > TempMaxElevation Then TempMaxElevation = TempList(i)
+            If TempList(i) < TempMinElevation Then TempMinElevation = TempList(i)
+
+            TempTotalElevation += Abs(TempList(i) - TempList(i + 1))
+        Next
+
+        RouteMaxHeight = Round(TempMaxElevation * FeetMultiplier, 3)
+        RouteMinHeight = Round(TempMinElevation * FeetMultiplier, 3)
+
+        RouteTotalHeight = Round(TempTotalElevation * FeetMultiplier)
+        RouteTime = Round(RouteDistance / WalkingSpeed, 3)
+
+        RouteStatsBool = True
+
+        If ImperialBool = True Then
+            kmstring = "miles"
+            mstring = "ft"
+        Else
+            kmstring = "km"
+            mstring = "m"
+        End If
+
+
+        WriteRouteStats()
+        Form1.WriteRouteStats()
+
+    End Sub
+
+    Sub WriteRouteStats()
+        If RouteStatsBool Then
+            Lbl_Length.Text = "Lenght: " + RouteDistance.ToString + kmstring
+            Lbl_MaxElevation.Text = "Maxumum Elevation: " + RouteMaxHeight.ToString + mstring
+            Lbl_MinElevation.Text = "Minumum Elevation: " + RouteMinHeight.ToString + mstring
+            Lbl_TotalElevation.Text = "Total Elevation: " + RouteTotalHeight.ToString + mstring
+            Lbl_Duration.Text = "Duration: " + RouteTime.ToString + "h"
+        Else
+            Lbl_Length.Text = "Lenght: ----"
+            Lbl_MaxElevation.Text = "Maxumum Elevation: ----"
+            Lbl_MinElevation.Text = "Minumum Elevation: ----"
+            Lbl_TotalElevation.Text = "Total Elevation: ----"
+            Lbl_Duration.Text = "Duration: ----"
+        End If
+        Lbl_Elevation.Text = "Elevation (" + mstring + ")"
+        Lbl_Distance.Text = "Distance (" + kmstring + ")"
+    End Sub
     Private Sub Node_Click(sender As Object, e As EventArgs)
         ClickedButton = DirectCast(sender, Button)
         Dim Tempi As Integer
@@ -333,7 +489,7 @@ Public Class Form2
                 End If
             Next
 
-            If ClickedButton.Location = New Point(250, 600) Then
+            If ClickedButton.Location = IntermidateNodeLocation Then
                 CreateNode()
                 NodeList(NodeList.Count - 1).Enabled = False
             End If
@@ -374,15 +530,15 @@ Public Class Form2
 
                 If ClickedButton.Name = "StartNode" Then
 
-                    ClickedButton.Location = New Point(500, 900)
+                    ClickedButton.Location = StartNodeLocation
 
                 ElseIf ClickedButton.Name = "EndNode" Then
 
-                    ClickedButton.Location = New Point(500, 950)
+                    ClickedButton.Location = EndNodeLocation
                 Else
                     Me.Controls.Remove(NodeList(NodeList.Count - 1))
                     NodeList.RemoveAt(NodeList.Count - 1)
-                    ClickedButton.Location = New Point(250, 600)
+                    ClickedButton.Location = IntermidateNodeLocation
                 End If
             End If
             GeneralNodeSwitch = False
@@ -417,10 +573,24 @@ Public Class Form2
         Next
     End Sub
     Sub ClearPath()
+        GenerateBool = True
         TranslatedPathPointList.Clear()
         PathMark.Clear()
         Array.Clear(PathPointArray, 0, PathPointArray.Length)
         PathLength = 0
+        RouteStatsBool = False
+        WriteRouteStats()
+        Form1.WriteRouteStats()
+        Me.Invalidate()
+    End Sub
+
+    Sub ClearProfile()
+        MaxElevation = 0
+        MinElevation = 0
+        HeightScale = 0
+        WidthScale = 0
+        ElevationCoordiates.Clear()
+        ElevationProfileHeights.Clear()
         Me.Invalidate()
     End Sub
 
@@ -429,8 +599,8 @@ Public Class Form2
             Me.Controls.Remove(NodeList(i))
             NodeList.RemoveAt(NodeList.Count - 1)
         Next
-        StartNode.Location = New Point(500, 900)
-        EndNode.Location = New Point(500, 950)
+        StartNode.Location = StartNodeLocation
+        EndNode.Location = EndNodeLocation
         ClearPath()
         CreateNode()
 
@@ -451,9 +621,9 @@ Public Class Form2
 
         Dim TempBtn As New Button() With {
                 .Name = "Intermediate" & NodeList.Count.ToString,
-                .Location = New Point(250, 600),
+                .Location = IntermidateNodeLocation,
                 .FlatStyle = FlatStyle.Flat,
-                .BackColor = Color.Yellow,
+                .BackColor = IntermediateNodeColour,
                 .Region = New Region(Path3)
         }
 
@@ -472,7 +642,7 @@ Public Class Form2
         ThreeDScaleFactor = ThreeDScaleFactorDeterminant()
         Formalities2d()
         ClearNodes()
-
+        Lbl_MapSize.Text = "Map Size: " + MapWidth.ToString + "x" + MapDepth.ToString
         If MapWidth = 10 Then
             Btn_WidthDown.Enabled = False
         End If
@@ -486,7 +656,7 @@ Public Class Form2
         ThreeDScaleFactor = ThreeDScaleFactorDeterminant()
         Formalities2d()
         ClearNodes()
-
+        Lbl_MapSize.Text = "Map Size: " + MapWidth.ToString + "x" + MapDepth.ToString
         If MapWidth = 100 Then
             Btn_WidthUp.Enabled = False
         End If
@@ -501,6 +671,7 @@ Public Class Form2
         ThreeDScaleFactor = ThreeDScaleFactorDeterminant()
         Formalities2d()
         ClearNodes()
+        Lbl_MapSize.Text = "Map Size: " + MapWidth.ToString + "x" + MapDepth.ToString
         If MapDepth = 10 Then
             Btn_DepthDown.Enabled = False
         End If
@@ -513,9 +684,9 @@ Public Class Form2
 
         MapDepth += 10
         ThreeDScaleFactor = ThreeDScaleFactorDeterminant()
-
         Formalities2d()
         ClearNodes()
+        Lbl_MapSize.Text = "Map Size: " + MapWidth.ToString + "x" + MapDepth.ToString
         If MapDepth = 100 Then
             Btn_DepthUp.Enabled = False
         End If
@@ -544,4 +715,16 @@ Public Class Form2
                 Return 2
         End Select
     End Function
+
+    Private Sub Btn_2DMeshColoring_Click(sender As Object, e As EventArgs)
+        Mesh_Colouring.Show()
+    End Sub
+
+    Private Sub Btn_RouteColouring_Click(sender As Object, e As EventArgs) Handles Btn_RouteColouring.Click
+        Route_Colouring.Show()
+    End Sub
+
+    Private Sub Btn_Preferances_Click(sender As Object, e As EventArgs) Handles Btn_Preferances.Click
+        Preferences.Show()
+    End Sub
 End Class

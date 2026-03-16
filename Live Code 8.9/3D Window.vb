@@ -2,6 +2,7 @@
 Imports System.Drawing.Drawing2D
 Imports System.Math
 Imports System.Threading
+Imports System.Windows.Forms.VisualStyles.VisualStyleElement
 Imports Live_Code_8._9.Form1
 
 Module Globals3D
@@ -19,6 +20,8 @@ Module Globals3D
     Public YValue(MapWidth, MapDepth) As Double
 
     Public ChunkSize As Integer = 5
+    Public OctaveNum As Integer = 5
+    Public Lacunarity As Double = 0.5
     Public XChunkAmount As Integer = MapWidth / ChunkSize
     Public ZChunkAmount As Integer = MapDepth / ChunkSize
 
@@ -30,21 +33,39 @@ Module Globals3D
     Public SortedTopTriangleItemList As New List(Of Triangle3D)
     Public SortedBottemTriangleItemList As New List(Of Triangle3D)
 
-    Public Extremity As Integer = 50
+    Public Extremity As Integer = 40
 
     Public YValForColour As Double
+
+
+
+    Public PerlinNoisePerm() As Integer = {151, 160, 137, 91, 90, 15, 131, 13, 201, 95, 96, 53, 194, 233, 7, 225,
+                      140, 36, 103, 30, 69, 142, 8, 99, 37, 240, 21, 10, 23, 190, 6, 148,
+                      247, 120, 234, 75, 0, 26, 197, 62, 94, 252, 219, 203, 117, 35, 11, 32,
+                       57, 177, 33, 88, 237, 149, 56, 87, 174, 20, 125, 136, 171, 168, 68, 175,
+                       74, 165, 71, 134, 139, 48, 27, 166, 77, 146, 158, 231, 83, 111, 229, 122,
+                       60, 211, 133, 230, 220, 105, 92, 41, 55, 46, 245, 40, 244, 102, 143, 54,
+                       65, 25, 63, 161, 1, 216, 80, 73, 209, 76, 132, 187, 208, 89, 18, 169,
+                      200, 196, 135, 130, 116, 188, 159, 86, 164, 100, 109, 198, 173, 186, 3, 64,
+                       52, 217, 226, 250, 124, 123, 5, 202, 38, 147, 118, 126, 255, 82, 85, 212,
+                      207, 206, 59, 227, 47, 16, 58, 17, 182, 189, 28, 42, 223, 183, 170, 213,
+                      119, 248, 152, 2, 44, 154, 163, 70, 221, 153, 101, 155, 167, 43, 172, 9,
+                      129, 22, 39, 253, 19, 98, 108, 110, 79, 113, 224, 232, 178, 185, 112, 104,
+                      218, 246, 97, 228, 251, 34, 242, 193, 238, 210, 144, 12, 191, 179, 162, 241,
+                       81, 51, 145, 235, 249, 14, 239, 107, 49, 192, 214, 31, 181, 199, 106, 157,
+                      184, 84, 204, 176, 115, 121, 50, 45, 127, 4, 150, 254, 138, 236, 205, 93,
+                      222, 114, 67, 29, 24, 72, 243, 141, 128, 195, 78, 66, 215, 61, 156, 180}
+
+
 End Module
 Public Class Form1
     Dim rnd As New Random()
 
     Dim AngleY As Double = 0
     Dim AngleX As Double = 0
-    Dim A As Double = PI / 4
+    Dim A As Double = PI / 6
 
 
-    Dim GridPen As New Pen(Color.IndianRed, 0.5)
-    Dim MiddleBlue As Color = Color.FromArgb(86, 108, 242)
-    Dim BetweenMiddleAndLightBlue As Color = Color.FromArgb(130, 162, 236)
     Dim LighterIndianRed As Color = Color.FromArgb(235, 130, 130)
 
     Dim MouseZoom As Double = 0
@@ -60,6 +81,10 @@ Public Class Form1
     Dim CompassAngle As Double
     Dim compassBool As Boolean
     Dim TotalAngle As Double
+
+    Dim UpdateExtremityBool As Boolean
+    Dim UpdateAngleBool As Boolean
+    Dim UpdateLacunarityBool As Boolean
 
     Public Structure Triangle3D
         Public P1 As Point
@@ -79,8 +104,8 @@ Public Class Form1
             Me.Y = y
             Me.Z = z
         End Sub
-
     End Structure
+
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Form2.Show()
@@ -96,10 +121,10 @@ Public Class Form1
         Me.Size = New Size(1600, 800)
         Me.DoubleBuffered = True
 
-        PictureBox1.Location = New Point(0, 0)
-        PictureBox1.Size = New Size(300, Me.Height + 42)
-        PictureBox2.Location = New Point(300, (Me.Height + 42) - 240)
-        PictureBox2.Size = New Size(Me.Width, 240)
+        'PictureBox1.Location = New Point(0, 0)
+        'PictureBox1.Size = New Size(300, Me.Height + 42)
+        'PictureBox2.Location = New Point(300, (Me.Height + 42) - 240)
+        'PictureBox2.Size = New Size(Me.Width, 240)
         PictureBox3.Location = New Point(0, 0)
         PictureBox3.Size = New Size(5, Me.Height + 42)
         PictureBox4.Location = New Point(300, 0)
@@ -153,9 +178,9 @@ Public Class Form1
                 ) / 3
 
                 TopTriangle.Elevation = (
-                    OGPointArray(i, j).Y +
-                    OGPointArray(i + 1, j).Y +
-                    OGPointArray(i, j + 1).Y
+                    YValue(i, j) +
+                    YValue(i + 1, j) +
+                    YValue(i, j + 1)
                 ) / 3
 
                 TopTriangleItemList.Add(TopTriangle)
@@ -173,9 +198,9 @@ Public Class Form1
                 ) / 3
 
                 BottemTriangle.Elevation = (
-                    OGPointArray(i + 1, j).Y +
-                    OGPointArray(i, j + 1).Y +
-                    OGPointArray(i + 1, j + 1).Y
+                    YValue(i, j) +
+                    YValue(i + 1, j) +
+                    YValue(i, j + 1)
                 ) / 3
 
                 BottemTriangleItemList.Add(BottemTriangle)
@@ -215,10 +240,10 @@ Public Class Form1
         Dim Index2 As Integer = 0
 
         While Index1 < List1.Count And Index2 < List2.Count
-            If List1(Index1).Depth > List2(Index2).Depth Then
+            If List1(Index1).Depth < List2(Index2).Depth Then
                 NewList.Add(List2(Index2))
                 Index2 += 1
-            ElseIf List1(Index1).Depth < List2(Index2).Depth Then
+            ElseIf List1(Index1).Depth > List2(Index2).Depth Then
                 NewList.Add(List1(Index1))
                 Index1 += 1
             ElseIf List1(Index1).Depth = List2(Index2).Depth Then
@@ -245,8 +270,8 @@ Public Class Form1
         e.Graphics.Clear(Color.Black)
         Dim CustomBrush As New SolidBrush(LighterIndianRed)
         e.Graphics.SmoothingMode = SmoothingMode.AntiAlias
-
-
+        RoutePen.Width = RouteWidth
+        RoutePen.Color = RouteColour
 
         SortedTopTriangleItemList = MergeSortTriangles(TopTriangleItemList)
         SortedBottemTriangleItemList = MergeSortTriangles(BottemTriangleItemList)
@@ -257,54 +282,121 @@ Public Class Form1
                 YValForColour = SortedTopTriangleItemList(i).Elevation
                 CustomBrush.Color = ColorGradient(YValForColour)
                 e.Graphics.FillPolygon(CustomBrush, TopPoints)
+
+                Dim TempPoint1 As New Point
+                Dim TempPoint2 As New Point
+                For x = 0 To PathMark.Count - 2
+                    TempPoint1 = NewPointArray(PathMark(x).X, PathMark(x).Y)
+                    TempPoint2 = NewPointArray(PathMark(x + 1).X, PathMark(x + 1).Y)
+
+                    If TempPoint1 = SortedTopTriangleItemList(i).P1 Then
+                        If TempPoint2 = SortedTopTriangleItemList(i).P2 Then
+                            e.Graphics.DrawLine(RoutePen, TempPoint1, TempPoint2)
+                        ElseIf TempPoint2 = SortedTopTriangleItemList(i).P3 Then
+                            e.Graphics.DrawLine(RoutePen, TempPoint1, TempPoint2)
+                        End If
+                    ElseIf TempPoint1 = SortedTopTriangleItemList(i).P2 Then
+                        If TempPoint2 = SortedTopTriangleItemList(i).P1 Then
+                            e.Graphics.DrawLine(RoutePen, TempPoint1, TempPoint2)
+                        ElseIf TempPoint2 = SortedTopTriangleItemList(i).P3 Then
+                            e.Graphics.DrawLine(RoutePen, TempPoint1, TempPoint2)
+                        End If
+                    ElseIf TempPoint1 = SortedTopTriangleItemList(i).P3 Then
+                        If TempPoint2 = SortedTopTriangleItemList(i).P1 Then
+                            e.Graphics.DrawLine(RoutePen, TempPoint1, TempPoint2)
+                        ElseIf TempPoint2 = SortedTopTriangleItemList(i).P2 Then
+                            e.Graphics.DrawLine(RoutePen, TempPoint1, TempPoint2)
+                        End If
+                    End If
+                Next
+
+
             End If
             If SortedBottemTriangleItemList IsNot Nothing Then
                 Dim BottemPoints() As Point = {SortedBottemTriangleItemList(i).P1, SortedBottemTriangleItemList(i).P2, SortedBottemTriangleItemList(i).P3}
                 YValForColour = SortedBottemTriangleItemList(i).Elevation
                 CustomBrush.Color = OffColorGradient(YValForColour)
                 e.Graphics.FillPolygon(CustomBrush, BottemPoints)
+
+                Dim TempPoint1 As New Point
+                Dim TempPoint2 As New Point
+                For x = 0 To PathMark.Count - 2
+                    TempPoint1 = NewPointArray(PathMark(x).X, PathMark(x).Y)
+                    TempPoint2 = NewPointArray(PathMark(x + 1).X, PathMark(x + 1).Y)
+
+                    If TempPoint1 = SortedBottemTriangleItemList(i).P1 Then
+                        If TempPoint2 = SortedBottemTriangleItemList(i).P2 Then
+                            e.Graphics.DrawLine(RoutePen, TempPoint1, TempPoint2)
+                        ElseIf TempPoint2 = SortedBottemTriangleItemList(i).P3 Then
+                            e.Graphics.DrawLine(RoutePen, TempPoint1, TempPoint2)
+                        End If
+                    ElseIf TempPoint1 = SortedBottemTriangleItemList(i).P2 Then
+                        If TempPoint2 = SortedBottemTriangleItemList(i).P1 Then
+                            e.Graphics.DrawLine(RoutePen, TempPoint1, TempPoint2)
+                        ElseIf TempPoint2 = SortedBottemTriangleItemList(i).P3 Then
+                            e.Graphics.DrawLine(RoutePen, TempPoint1, TempPoint2)
+                        End If
+                    ElseIf TempPoint1 = SortedBottemTriangleItemList(i).P3 Then
+                        If TempPoint2 = SortedBottemTriangleItemList(i).P1 Then
+                            e.Graphics.DrawLine(RoutePen, TempPoint1, TempPoint2)
+                        ElseIf TempPoint2 = SortedBottemTriangleItemList(i).P2 Then
+                            e.Graphics.DrawLine(RoutePen, TempPoint1, TempPoint2)
+                        End If
+                    End If
+                Next
             End If
         Next
 
 
         For j = 0 To MapDepth
             For i = 0 To MapWidth - 1
-                GridPen.Color = Color.Wheat
-                GridPen.Width = 0.25
+                RoutePen.Color = Color.Wheat
+                RoutePen.Width = 0.25
                 'e.Graphics.DrawLine(GridPen, NewPointArray(i, j), NewPointArray(i + 1, j))
             Next
         Next
 
         For i = 0 To MapWidth
             For j = 0 To MapDepth - 1
-                GridPen.Color = Color.Wheat
-                GridPen.Width = 0.25
+                RoutePen.Color = Color.Wheat
+                RoutePen.Width = 0.25
                 'e.Graphics.DrawLine(GridPen, NewPointArray(i, j), NewPointArray(i, j + 1))
             Next
         Next
 
         For j = 0 To MapDepth - 1
             For i = 0 To MapWidth - 1
-                GridPen.Color = Color.Wheat
-                GridPen.Width = 0.25
+                RoutePen.Color = Color.Wheat
+                RoutePen.Width = 0.25
                 'e.Graphics.DrawLine(GridPen, NewPointArray(i + 1, j), NewPointArray(i, j + 1))
             Next
         Next
+        Dim RectBrush As New SolidBrush(Color.FromArgb(0, 70, 120))
+        Dim PicBox2 As New Rectangle(300, (Me.Height) - 240, Me.Width, 240)
+        Dim PicBox1 As New Rectangle(0, 0, 300, (Me.Height + 42))
+        e.Graphics.FillRectangle(RectBrush, PicBox2)
+        e.Graphics.FillRectangle(RectBrush, PicBox1)
 
-        GridPen.Width = 4
-        For i = 0 To PathMark.Count - 2
-            If i = 0 Then
-                GridPen.Color = Color.Lime
-            ElseIf i = PathMark.Count - 2 Then
-                GridPen.Color = Color.Red
-            Else
-                GridPen.Color = Color.Yellow
-            End If
-            e.Graphics.DrawLine(GridPen, NewPointArray(PathMark(i).X, PathMark(i).Y), NewPointArray(PathMark(i + 1).X, PathMark(i + 1).Y))
+
+        Dim TempPen As New Pen(Color.White, 4)
+        e.Graphics.DrawLine(TempPen, New Point(400, 1020), New Point(400, 870))
+        e.Graphics.DrawLine(TempPen, New Point(400, 1020), New Point(1400, 1020))
+
+        TempPen.Width = 1
+        For x = 0 To PathMark.Count - 2
+            e.Graphics.DrawLine(TempPen, ElevationCoordiates(x), ElevationCoordiates(x + 1))
         Next
+
+
+        Dim ArrowBrush As New SolidBrush(Color.White)
+        Dim ArrowPoints1() As Point = {New Point(392, 870), New Point(408, 870), New Point(400, 855)}
+        e.Graphics.FillPolygon(ArrowBrush, ArrowPoints1)
+        Dim ArrowPoints2() As Point = {New Point(1400, 1012), New Point(1400, 1028), New Point(1415, 1020)}
+        e.Graphics.FillPolygon(ArrowBrush, ArrowPoints2)
     End Sub
 
     Protected Overrides Sub OnPaint(e As PaintEventArgs)
+        If compass Is Nothing Then Exit Sub
         If compassBool Then
             TotalAngle = 0
             CompassAngle = 0
@@ -326,39 +418,74 @@ Public Class Form1
     End Sub
 
     Public Function ColorGradient(ByVal YValForColour) As Color
-        If YValForColour < 145 Then
-            Return Color.LightBlue
-        ElseIf YValForColour >= 145 And YValForColour < 150 Then
-            Return BetweenMiddleAndLightBlue
-        ElseIf YValForColour >= 150 And YValForColour < 157 Then
-            Return MiddleBlue
+        If YValForColour < 0.6 Then
+            Return Color.FromArgb(220, 220, 220)
+        ElseIf YValForColour >= 0.6 And YValForColour < 0.7 Then
+            Return Color.FromArgb(200, 200, 200)
+        ElseIf YValForColour >= 0.7 And YValForColour < 0.8 Then
+            Return Color.FromArgb(180, 180, 180)
+        ElseIf YValForColour >= 0.8 And YValForColour < 0.9 Then
+            Return Color.FromArgb(160, 160, 160)
+        ElseIf YValForColour >= 0.9 And YValForColour < 1 Then
+            Return Color.FromArgb(140, 140, 140)
+        ElseIf YValForColour >= 1 And YValForColour < 1.1 Then
+            Return Color.FromArgb(120, 120, 120)
+        ElseIf YValForColour >= 1.1 And YValForColour < 1.2 Then
+            Return Color.FromArgb(100, 100, 100)
         Else
-            Return Color.Blue
+            Return Color.FromArgb(80, 80, 80)
         End If
     End Function
 
     Public Function OffColorGradient(ByVal YValForColour) As Color
-        If YValForColour < 145 Then
-            Return Color.FromArgb(150, 200, 220)
-        ElseIf YValForColour >= 145 And YValForColour < 150 Then
-            Return Color.FromArgb(115, 145, 220)
-        ElseIf YValForColour >= 150 And YValForColour < 157 Then
-            Return Color.FromArgb(70, 95, 230)
+        If YValForColour < 0.6 Then
+            Return Color.FromArgb(225, 225, 225)
+        ElseIf YValForColour >= 0.6 And YValForColour < 0.7 Then
+            Return Color.FromArgb(205, 205, 205)
+        ElseIf YValForColour >= 0.7 And YValForColour < 0.8 Then
+            Return Color.FromArgb(185, 185, 185)
+        ElseIf YValForColour >= 0.8 And YValForColour < 0.9 Then
+            Return Color.FromArgb(165, 165, 165)
+        ElseIf YValForColour >= 0.9 And YValForColour < 1 Then
+            Return Color.FromArgb(145, 145, 145)
+        ElseIf YValForColour >= 1 And YValForColour < 1.1 Then
+            Return Color.FromArgb(125, 125, 125)
+        ElseIf YValForColour >= 1.1 And YValForColour < 1.2 Then
+            Return Color.FromArgb(105, 105, 105)
         Else
-            Return Color.FromArgb(0, 0, 220)
+            Return Color.FromArgb(85, 85, 85)
         End If
     End Function
 
-    Sub PerspectiveProjection()
-        For j = 0 To MapDepth
-            For i = 0 To MapWidth
-                XpArray(i, j) = (OGPointArray(i, j).X / ((OGPointArray(i, j).Z + 200) * Tan(A / 2))) * 200
+    Sub KeyFunctions()
+        Array.Clear(YValue, 0, YValue.Length)
+        For q = 0 To OctaveNum - 1
+            PerlinNoise()
+
+            For j = 0 To MapDepth
+                For i = 0 To MapWidth
+                    YValue(i, j) += (FinalElevationArray(i, j) * (Lacunarity ^ q))
+                Next
             Next
         Next
 
         For j = 0 To MapDepth
             For i = 0 To MapWidth
-                YpArray(i, j) = ((OGPointArray(i, j).Y) / ((OGPointArray(i, j).Z + 200) * Tan(A / 2))) * 200
+                OGPointArray(i, j) = New Point3D((StartX) + (i * ThreeDScaleFactor), (YValue(i, j) * Extremity) + 110, StartZ - (j * ThreeDScaleFactor))
+            Next
+        Next
+    End Sub
+
+    Sub PerspectiveProjection()
+        For j = 0 To MapDepth
+            For i = 0 To MapWidth
+                XpArray(i, j) = (OGPointArray(i, j).X / ((OGPointArray(i, j).Z + 250) * Tan(A / 2))) * 200
+            Next
+        Next
+
+        For j = 0 To MapDepth
+            For i = 0 To MapWidth
+                YpArray(i, j) = ((OGPointArray(i, j).Y) / ((OGPointArray(i, j).Z + 250) * Tan(A / 2))) * 200
             Next
         Next
     End Sub
@@ -366,11 +493,17 @@ Public Class Form1
     Sub PerlinNoise()
         Dim rand As New Random()
         Dim MaxVal As Double = 1.67 * ChunkSize
+        Dim RandomNumber As Integer
         Dim CardinalDirectionArray(XChunkAmount, ZChunkAmount) As Integer
 
         For y = 0 To ZChunkAmount
             For x = 0 To XChunkAmount
-                CardinalDirectionArray(x, y) = rand.Next(0, 12)
+                RandomNumber = (rand.Next(0, 256))
+                RandomNumber = PerlinNoisePerm(RandomNumber) Mod 16
+                If RandomNumber >= 12 Then
+                    RandomNumber -= 12
+                End If
+                CardinalDirectionArray(x, y) = RandomNumber
             Next
         Next
 
@@ -381,7 +514,6 @@ Public Class Form1
 
         Dim TLTRElevationArray(MapWidth, MapDepth) As Double
         Dim BLBRElevationArray(MapWidth, MapDepth) As Double
-
 
         For y = 0 To ZChunkAmount - 1
             For x = 0 To XChunkAmount - 1
@@ -410,19 +542,19 @@ Public Class Form1
             For x = 0 To MapWidth
 
                 Temp1 = TLElevationArray(x, y)
-                xf = Abs((Temp1 + MaxVal) / (MaxVal * 2))
+                xf = (Temp1 + MaxVal) / (MaxVal * 2)
                 TLElevationArray(x, y) = 6 * (xf ^ 5) - 15 * (xf ^ 4) + 10 * (xf ^ 3)
 
                 Temp1 = TRElevationArray(x, y)
-                xf = Abs((Temp1 + MaxVal) / (MaxVal * 2))
+                xf = (Temp1 + MaxVal) / (MaxVal * 2)
                 TRElevationArray(x, y) = 6 * (xf ^ 5) - 15 * (xf ^ 4) + 10 * (xf ^ 3)
 
                 Temp1 = BLElevationArray(x, y)
-                xf = Abs((Temp1 + MaxVal) / (MaxVal * 2))
+                xf = (Temp1 + MaxVal) / (MaxVal * 2)
                 BLElevationArray(x, y) = 6 * (xf ^ 5) - 15 * (xf ^ 4) + 10 * (xf ^ 3)
 
                 Temp1 = BRElevationArray(x, y)
-                xf = Abs((Temp1 + MaxVal) / (MaxVal * 2))
+                xf = (Temp1 + MaxVal) / (MaxVal * 2)
                 BRElevationArray(x, y) = 6 * (xf ^ 5) - 15 * (xf ^ 4) + 10 * (xf ^ 3)
             Next
         Next
@@ -496,7 +628,6 @@ Public Class Form1
         Next
 
 
-
     End Sub
 
     Sub RotateY()
@@ -552,16 +683,45 @@ Public Class Form1
     End Sub
 
     Private Sub Btn_Regenerate_Click(sender As Object, e As EventArgs) Handles Btn_Regenerate.Click
-        PerlinNoise()
+        Array.Clear(YValue, 0, YValue.Length)
+        For q = 0 To OctaveNum - 1
+            PerlinNoise()
+
+            For j = 0 To MapDepth
+                For i = 0 To MapWidth
+                    YValue(i, j) += (FinalElevationArray(i, j) * (Lacunarity ^ q))
+                Next
+            Next
+        Next
+
         For j = 0 To MapDepth
             For i = 0 To MapWidth
-                YValue(i, j) = (FinalElevationArray(i, j) * Extremity) + 125
-                OGPointArray(i, j).Y = YValue(i, j)
+                OGPointArray(i, j).Y = (YValue(i, j) * Extremity) + 110
             Next
         Next
 
         PPand2DArray()
+        Form2.ElevationProfile()
+        Form2.RouteStats()
         Me.Invalidate()
+    End Sub
+    Sub WriteRouteStats()
+        If RouteStatsBool = True Then
+
+            Lbl_Length.Text = "Lenght: " + RouteDistance.ToString + kmstring
+            Lbl_MaxElevation.Text = "Maxumum Elevation: " + RouteMaxHeight.ToString + mstring
+            Lbl_MinElevation.Text = "Minumum Elevation: " + RouteMinHeight.ToString + mstring
+            Lbl_TotalElevation.Text = "Total Elevation: " + RouteTotalHeight.ToString + mstring
+            Lbl_Duration.Text = "Duration: " + RouteTime.ToString + "h"
+        Else
+            Lbl_Length.Text = "Lenght: ----"
+            Lbl_MaxElevation.Text = "Maxumum Elevation: ----"
+            Lbl_MinElevation.Text = "Minumum Elevation: ----"
+            Lbl_TotalElevation.Text = "Total Elevation: ----"
+            Lbl_Duration.Text = "Duration: ----"
+        End If
+        Lbl_Elevation.Text = "Elevation (" + mstring + ")"
+        Lbl_Distance.Text = "Distance (" + kmstring + ")"
     End Sub
 
     Private Sub Btn_Orbit_Click(sender As Object, e As EventArgs) Handles Btn_Orbit.Click
@@ -572,7 +732,6 @@ Public Class Form1
             Timer1.Stop()
             OrbitSwitch = False
         End If
-
 
     End Sub
 
@@ -594,12 +753,109 @@ Public Class Form1
     Sub Reset()
         For j = 0 To MapDepth
             For i = 0 To MapWidth
-                OGPointArray(i, j) = New Point3D((StartX) + (i * ThreeDScaleFactor), YValue(i, j), StartZ - (j * ThreeDScaleFactor))
+                OGPointArray(i, j) = New Point3D((StartX) + (i * ThreeDScaleFactor), (YValue(i, j) * Extremity) + 110, StartZ - (j * ThreeDScaleFactor))
             Next
         Next
         PPand2DArray()
-        Me.Invalidate()
         compassBool = True
+        Me.Invalidate()
+
     End Sub
 
+    Private Sub Txt_Extremity_TextChanged(sender As Object, e As EventArgs) Handles Txt_Extremity.TextChanged
+        UpdateExtremityBool = False
+        Dim TempInput As String = Txt_Extremity.Text
+        Dim TempValidInput As Integer
+        Integer.TryParse(TempInput, TempValidInput)
+
+
+        If TempValidInput > 0 And TempValidInput < 60 Then
+            Extremity = TempValidInput
+            UpdateExtremityBool = True
+        End If
+
+    End Sub
+
+    Private Sub Btn_UpdateExtremity_Click(sender As Object, e As EventArgs) Handles Btn_UpdateExtremity.Click
+        If UpdateExtremityBool = True Then
+            For j = 0 To MapDepth
+                For i = 0 To MapWidth
+                    OGPointArray(i, j).Y = (YValue(i, j) * Extremity) + 110
+                Next
+            Next
+            PPand2DArray()
+            Me.Invalidate()
+        End If
+    End Sub
+
+    Private Sub Txt_Angle_TextChanged(sender As Object, e As EventArgs) Handles Txt_Angle.TextChanged
+        UpdateAngleBool = False
+        Dim TempInput = Txt_Angle.Text
+        Dim TempValidInput As Integer
+        Integer.TryParse(TempInput, TempValidInput)
+
+
+        If TempValidInput > 15 And TempValidInput < 180 Then
+
+            A = TempValidInput / 180 * PI
+            UpdateAngleBool = True
+        End If
+
+    End Sub
+
+    Private Sub Btn_UpdateAngle_Click(sender As Object, e As EventArgs) Handles Btn_UpdateAngle.Click
+        If UpdateAngleBool = True Then
+            PPand2DArray()
+            Invalidate()
+        End If
+    End Sub
+
+    Private Sub Btn_OctaveDown_Click(sender As Object, e As EventArgs) Handles Btn_OctaveDown.Click
+        If OctaveNum = 10 Then
+            Btn_OctaveUp.Enabled = True
+        End If
+        OctaveNum -= 1
+        KeyFunctions()
+        PPand2DArray()
+        Me.Invalidate()
+        If OctaveNum = 1 Then
+            Btn_OctaveDown.Enabled = False
+        End If
+    End Sub
+
+    Private Sub Btn_OctaveUp_Click(sender As Object, e As EventArgs) Handles Btn_OctaveUp.Click
+        If OctaveNum = 1 Then
+            Btn_OctaveDown.Enabled = True
+        End If
+        OctaveNum += 1
+        KeyFunctions()
+        PPand2DArray()
+        compassBool = True
+        Me.Invalidate()
+        If OctaveNum = 10 Then
+            Btn_OctaveUp.Enabled = False
+        End If
+    End Sub
+
+    Private Sub Txt_Lacunarity_TextChanged(sender As Object, e As EventArgs) Handles Txt_Lacunarity.TextChanged
+        UpdateLacunarityBool = False
+        Dim TempInput = Txt_Lacunarity.Text
+        Dim TempValidInput As Double
+        Double.TryParse(TempInput, TempValidInput)
+
+
+        If TempValidInput > 0 And TempValidInput < 1 Then
+
+            Lacunarity = TempValidInput
+            UpdateLacunarityBool = True
+        End If
+    End Sub
+
+    Private Sub Btn_UpdateLacunarity_Click(sender As Object, e As EventArgs) Handles Btn_UpdateLacunarity.Click
+        If UpdateLacunarityBool = True Then
+            KeyFunctions()
+            PPand2DArray()
+            Me.Invalidate()
+        End If
+    End Sub
 End Class
