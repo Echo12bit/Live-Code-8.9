@@ -6,13 +6,13 @@ Public Class Route_Colouring
     Dim EndNodeSelector As Boolean
 
     Private Sub Btn_HideRoteColouring_Click(sender As Object, e As EventArgs) Handles Btn_HideRoteColouring.Click
-        Me.Hide()
+        Me.Hide() 'button that hides the form if clicked
     End Sub
 
     Private Sub Button_Click(sender As Object, e As EventArgs) _
     Handles Btn_RouteRed.Click, Btn_RouteOrange.Click, Btn_RouteYellow.Click, Btn_RouteGreen.Click, Btn_RouteCyan.Click, Btn_RouteBlue.Click, Btn_RoutePurple.Click, Btn_RoutePink.Click, Btn_RouteWidth2.Click, Btn_RouteWidth4.Click, Btn_RouteWidth6.Click, Btn_RouteWidth8.Click
 
-        Dim btn = CType(sender, Button)
+        Dim btn = CType(sender, Button) 'allows button click to be detected
 
         Select Case btn.Name
             Case "Btn_RouteRed"
@@ -40,10 +40,8 @@ Public Class Route_Colouring
             Case "Btn_RouteWidth8"
                 RouteWidth = 8
         End Select
-        Form2.Invalidate()
-    End Sub
-    Private Sub Form2_Paint(sender As Object, e As PaintEventArgs) Handles MyBase.Paint
-
+        'select case to find which button was clicked an update corresponding property
+        Form2.Invalidate() 'invalidates 2D form to perform imediate update to customisation
     End Sub
 
     Private Sub Route_Colouring_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -57,18 +55,19 @@ Public Class Route_Colouring
         Btn_RouteBlue.Region = New Region(Path1)
         Btn_RoutePurple.Region = New Region(Path1)
         Btn_RoutePink.Region = New Region(Path1)
+        'changes route colour buttons to be circular
     End Sub
 
     Private Sub Btn_NodeRed_Click(sender As Object, e As EventArgs) Handles Btn_NodeRed.Click
-        Select Case ComboBox1.SelectedItem.ToString
+        Select Case ComboBox1.SelectedItem.ToString 'select case to determine which drop down option was selected 
             Case "StartNode"
-                StartNodeColour = Color.Red
+                StartNodeColour = Color.Red 'in the case of startnode, updates its colour variable
             Case "EndNode"
-                EndNodeColour = Color.Red
+                EndNodeColour = Color.Red 'in the case of endnode, updates its colour variable
             Case "IntermediateNode"
-                IntermediateNodeColour = Color.Red
+                IntermediateNodeColour = Color.Red 'in the case of intermediatenode, updates its colour variable
         End Select
-        Form2.Invalidate()
+        Form2.Invalidate() 'invalidates 2D form to perform imediate update to customisation
     End Sub
 
     Private Sub Btn_NodeOrange_Click(sender As Object, e As EventArgs) Handles Btn_NodeOrange.Click
